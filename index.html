@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>中文小学版 · 第三册</title>
+<meta name="theme-color" content="#0277bd">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:'Segoe UI','PingFang SC','Helvetica Neue',sans-serif;
+  background:#e8f4fa;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+canvas#bgcanvas{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  z-index:0;pointer-events:none;opacity:0.4;
+}
+
+/* ── HEADER ── */
+header{
+  position:relative;z-index:10;
+  background:linear-gradient(135deg,#0277bd 0%,#0288d1 60%,#01579b 100%);
+  padding:28px 20px 22px;
+  text-align:center;
+  box-shadow:0 4px 20px rgba(2,119,189,0.35);
+}
+.header-badge{
+  display:inline-block;
+  background:rgba(255,255,255,0.18);
+  border:1px solid rgba(255,255,255,0.4);
+  border-radius:20px;
+  padding:4px 16px;
+  font-size:0.78rem;
+  color:rgba(255,255,255,0.9);
+  letter-spacing:3px;
+  margin-bottom:10px;
+}
+header h1{
+  font-size:2rem;
+  color:#fff;
+  text-shadow:0 2px 10px rgba(0,0,0,0.2);
+  margin-bottom:4px;
+}
+header h1 span{
+  font-size:1rem;
+  color:rgba(255,255,255,0.82);
+  display:block;
+  margin-top:4px;
+  letter-spacing:1px;
+}
+.header-sub{
+  font-size:0.82rem;
+  color:rgba(255,255,255,0.72);
+  margin-top:8px;
+}
+
+/* ── INTRO STRIP ── */
+.intro{
+  position:relative;z-index:5;
+  background:#fff;
+  border-bottom:2px solid rgba(2,119,189,0.15);
+  padding:14px 20px;
+  text-align:center;
+  font-size:0.88rem;
+  color:#2a6080;
+}
+.intro strong{color:#0277bd;}
+
+/* ── LESSON GRID ── */
+.lessons-wrap{
+  position:relative;z-index:5;
+  max-width:900px;
+  margin:0 auto;
+  padding:20px 14px 50px;
+}
+.unit-title{
+  font-size:0.82rem;
+  color:#0288d1;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  margin:18px 0 10px;
+  display:flex;align-items:center;gap:10px;
+}
+.unit-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(2,119,189,0.3),transparent);}
+
+.lesson-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:12px;
+  margin-bottom:6px;
+}
+
+/* Base lesson card */
+.lesson-card{
+  display:block;
+  background:#fff;
+  border-radius:14px;
+  padding:18px 14px 16px;
+  text-align:center;
+  text-decoration:none;
+  border:2px solid transparent;
+  box-shadow:0 2px 12px rgba(2,119,189,0.1);
+  transition:all .22s;
+  position:relative;
+  overflow:hidden;
+}
+/* Coloured top stripe */
+.lesson-card::before{
+  content:'';
+  position:absolute;top:0;left:0;right:0;
+  height:4px;
+  background:var(--stripe,#0277bd);
+}
+
+/* Available = clickable */
+.lesson-card.available{
+  cursor:pointer;
+  border-color:rgba(2,119,189,0.18);
+}
+.lesson-card.available:hover{
+  transform:translateY(-4px);
+  box-shadow:0 8px 24px rgba(2,119,189,0.2);
+  border-color:rgba(2,119,189,0.5);
+}
+
+/* Coming soon = locked */
+.lesson-card.coming-soon{
+  opacity:0.55;
+  cursor:default;
+  pointer-events:none;
+  filter:grayscale(0.3);
+}
+
+.card-num{
+  font-size:0.72rem;
+  color:#7ab0cc;
+  letter-spacing:2px;
+  margin-bottom:6px;
+}
+.card-emoji{
+  font-size:2rem;
+  margin-bottom:8px;
+  display:block;
+}
+.card-cn{
+  font-size:1.15rem;
+  color:#012a45;
+  font-weight:700;
+  margin-bottom:4px;
+  line-height:1.2;
+}
+.card-py{
+  font-size:0.72rem;
+  color:#0288d1;
+  margin-bottom:3px;
+}
+.card-en{
+  font-size:0.72rem;
+  color:#2a6080;
+}
+.card-tag{
+  display:inline-block;
+  margin-top:8px;
+  padding:2px 10px;
+  border-radius:10px;
+  font-size:0.65rem;
+  font-weight:700;
+  letter-spacing:1px;
+}
+.available .card-tag{
+  background:#e1f5fe;
+  color:#0277bd;
+}
+.coming-soon .card-tag{
+  background:#f0f0f0;
+  color:#aaa;
+}
+
+/* ── FOOTER ── */
+footer{
+  position:relative;z-index:5;
+  text-align:center;
+  padding:20px;
+  font-size:0.8rem;
+  color:#7ab0cc;
+  border-top:1px solid rgba(2,119,189,0.12);
+  background:#fff;
+}
+</style>
+</head>
+<body>
+<canvas id="bgcanvas"></canvas>
+
+<header>
+  <div class="header-badge">中文小学版 · 第三册</div>
+  <h1>🏫 中文学习 第三册
+    <span>Chinese Language · Book 3 · Elementary</span>
+  </h1>
+  <div class="header-sub">互动课程 · Interactive Lessons · 7 Tabs per Lesson</div>
+</header>
+
+<div class="intro">
+  每课包含：<strong>课文朗读</strong> · <strong>生字练习</strong> · <strong>词语学习</strong> · <strong>对话互动</strong> · <strong>宾果游戏</strong> · <strong>趣味游戏</strong> · <strong>录音练习</strong>
+  &nbsp;|&nbsp; Each lesson: Story · Characters · Vocab · Dialogue · Bingo · Games · Recording
+</div>
+
+<div class="lessons-wrap">
+
+  <div class="unit-title">第一单元 Unit 1 — 生活常识 Daily Life</div>
+  <div class="lesson-grid">
+
+    <a href="lesson1.html" class="lesson-card available" style="--stripe:#0277bd">
+      <div class="card-num">第 1 课</div>
+      <span class="card-emoji">🚦</span>
+      <div class="card-cn">红绿灯</div>
+      <div class="card-py">hóng lǜ dēng</div>
+      <div class="card-en">Traffic Lights</div>
+      <span class="card-tag">✓ 开放</span>
+    </a>
+
+    <a href="lesson2.html" class="lesson-card coming-soon" style="--stripe:#0288d1">
+      <div class="card-num">第 2 课</div>
+      <span class="card-emoji">📚</span>
+      <div class="card-cn">去书店</div>
+      <div class="card-py">qù shū diàn</div>
+      <div class="card-en">Going to the Bookstore</div>
+      <span class="card-tag">即将开放</span>
+    </a>
+
+    <a href="lesson3.html" class="lesson-card coming-soon" style="--stripe:#01579b">
+      <div class="card-num">第 3 课</div>
+      <span class="card-emoji">🏥</span>
+      <div class="card-cn">看病</div>
+      <div class="card-py">kàn bìng</div>
+      <div class="card-en">Going to the Doctor</div>
+      <span class="card-tag">即将开放</span>
+    </a>
+
+    <a href="lesson4.html" class="lesson-card coming-soon" style="--stripe:#039be5">
+      <div class="card-num">第 4 课</div>
+      <span class="card-emoji">🏃</span>
+      <div class="card-cn">快乐运动</div>
+      <div class="card-py">kuàilè yùndòng</div>
+      <div class="card-en">Happy Exercise</div>
+      <span class="card-tag">即将开放</span>
+    </a>
+
+  </div>
+
+  <div class="unit-title">第二单元 Unit 2 — 自然世界 Nature</div>
+  <div class="lesson-grid">
+
+    <a href="lesson5.html" class="lesson-card coming-soon" style="--stripe:#00897b">
+      <div class="card-num">第 5 课</div>
+      <span class="card-emoji">🐝</span>
+      <div class="card-cn">小蜜蜂</div>
+      <div class="card-py">xiǎo mìfēng</div>
+      <div class="card-en">The Little Bee</div>
+      <span class="card-tag">即将开放</span>
+    </a>
+
+    <a href="lesson6.html" class="lesson-card coming-soon" style="--stripe:#00acc1">
+      <div class="card-num">第 6 课</div>
+      <span class="card-emoji">🌺</span>
+      <div class="card-cn">花和草</div>
+      <div class="card-py">huā hé cǎo</div>
+      <div class="card-en">Flowers and Grass</div>
+      <span class="card-tag">即将开放</span>
+    </a>
+
+    <a href="lesson7.html" class="lesson-card coming-soon" style="--stripe:#43a047">
+      <div class="card-num">第 7 课</div>
+      <span class="card-emoji">🌳</span>
+      <div class="card-cn">大树和小鸟</div>
+      <div class="card-py">dà shù hé xiǎo niǎo</div>
+      <div class="card-en">Big Tree & Little Bird</div>
+      <span class="card-tag">即将开放</span>
+    </a>
+
+    <a href="lesson8.html" class="lesson-card coming-soon" style="--stripe:#7cb342">
+      <div class="card-num">第 8 课</div>
+      <span class="card-emoji">🌧️</span>
+      <div class="card-cn">下雨了</div>
+      <div class="card-py">xià yǔ le</div>
+      <div class="card-en">It's Raining</div>
+      <span class="card-tag">即将开放</span>
+    </a>
+
+  </div>
+
+  <div class="unit-title">第三单元 Unit 3 — 故事世界 Stories</div>
+  <div class="lesson-grid">
+
+    <a href="lesson9.html" class="lesson-card coming-soon" style="--stripe:#f57c00">
+      <div class="card-num">第 9 课</div>
+      <span class="card-emoji">📖</span>
+      <div class="card-cn">童话故事</div>
+      <div class="card-py">tónghuà gùshi</div>
+      <div class="card-en">Fairy Tales</div>
+      <span class="card-tag">即将开放</span>
+    </a>
+
+    <a href="lesson10.html" class="lesson-card coming-soon" style="--stripe:#fb8c00">
+      <div class="card-num">第 10 课</div>
+      <span class="card-emoji">🌙</span>
+      <div class="card-cn">静夜思</div>
+      <div class="card-py">Jìng Yè Sī</div>
+      <div class="card-en">Quiet Night Thought</div>
+      <span class="card-tag">即将开放</span>
+    </a>
+
+    <a href="lesson11.html" class="lesson-card coming-soon" style="--stripe:#e53935">
+      <div class="card-num">第 11 课</div>
+      <span class="card-emoji">🏔️</span>
+      <div class="card-cn">登鹳雀楼</div>
+      <div class="card-py">Dēng Guànquè Lóu</div>
+      <div class="card-en">Ascending the Stork Tower</div>
+      <span class="card-tag">即将开放</span>
+    </a>
+
+    <a href="lesson12.html" class="lesson-card coming-soon" style="--stripe:#8e24aa">
+      <div class="card-num">第 12 课</div>
+      <span class="card-emoji">🎭</span>
+      <div class="card-cn">有趣的故事</div>
+      <div class="card-py">yǒuqù de gùshi</div>
+      <div class="card-en">Interesting Stories</div>
+      <span class="card-tag">即将开放</span>
+    </a>
+
+  </div>
+
+  <div class="unit-title">第四单元 Unit 4 — 中国文化 Culture</div>
+  <div class="lesson-grid">
+
+    <a href="lesson13.html" class="lesson-card coming-soon" style="--stripe:#c62828">
+      <div class="card-num">第 13 课</div>
+      <span class="card-emoji">🏮</span>
+      <div class="card-cn">过新年</div>
+      <div class="card-py">guò xīnnián</div>
+      <div class="card-en">Celebrating New Year</div>
+      <span class="card-tag">即将开放</span>
+    </a>
+
+    <a href="lesson14.html" class="lesson-card coming-soon" style="--stripe:#d32f2f">
+      <div class="card-num">第 14 课</div>
+      <span class="card-emoji">🐉</span>
+      <div class="card-cn">中国节日</div>
+      <div class="card-py">Zhōngguó jiérì</div>
+      <div class="card-en">Chinese Festivals</div>
+      <span class="card-tag">即将开放</span>
+    </a>
+
+    <a href="lesson15.html" class="lesson-card coming-soon" style="--stripe:#1565c0">
+      <div class="card-num">第 15 课</div>
+      <span class="card-emoji">🗺️</span>
+      <div class="card-cn">中国地图</div>
+      <div class="card-py">Zhōngguó dìtú</div>
+      <div class="card-en">Map of China</div>
+      <span class="card-tag">即将开放</span>
+    </a>
+
+    <a href="lesson16.html" class="lesson-card coming-soon" style="--stripe:#37474f">
+      <div class="card-num">第 16 课</div>
+      <span class="card-emoji">🎓</span>
+      <div class="card-cn">我长大了</div>
+      <div class="card-py">wǒ zhǎng dà le</div>
+      <div class="card-en">I've Grown Up</div>
+      <span class="card-tag">即将开放</span>
+    </a>
+
+  </div>
+</div>
+
+<footer>
+  中文小学版 第三册 · Chinese Language Elementary Book 3 · Interactive Learning Tool<br>
+  Built for 北美妈妈说 · 7 interactive tabs per lesson · Works offline
+</footer>
+
+<script>
+// Ocean bubble canvas animation
+(function(){
+  const c=document.getElementById('bgcanvas'),ctx=c.getContext('2d');
+  let bubbles=[];
+  function resize(){c.width=innerWidth;c.height=innerHeight;}
+  function init(){
+    bubbles=[];
+    for(let i=0;i<22;i++) bubbles.push({
+      x:Math.random()*c.width,y:c.height+Math.random()*c.height,
+      r:Math.random()*16+5,sp:Math.random()*.3+.1,op:Math.random()*.09+.03
+    });
+  }
+  function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    bubbles.forEach(b=>{
+      b.y-=b.sp;
+      if(b.y<-b.r*2){b.y=c.height+b.r;b.x=Math.random()*c.width;}
+      ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
+      ctx.strokeStyle=`rgba(2,119,189,${b.op+0.04})`;ctx.lineWidth=1.5;ctx.stroke();
+      ctx.fillStyle=`rgba(2,119,189,${b.op})`;ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',()=>{resize();init();});
+  resize();init();draw();
+})();
+</script>
+</body>
+</html>

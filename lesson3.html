@@ -221,6 +221,30 @@ header h1 span{font-size:0.9rem;color:rgba(255,255,255,0.8);display:block;margin
 .cpc{position:fixed;width:9px;height:9px;border-radius:2px;animation:cfFall 1.4s ease-in forwards;pointer-events:none;z-index:1000;}
 @keyframes cfFall{0%{transform:translateY(-20px) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
 @media(max-width:480px){header h1{font-size:1.4rem;}.char-grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));}.match-grid{grid-template-columns:repeat(3,1fr);}}
+
+/* ── PATTERN TAB (句型) ── */
+.pattern-display{text-align:center;padding:18px 10px 12px;background:linear-gradient(135deg,var(--char-active-bg),var(--card-bg));border-radius:12px;margin-bottom:12px;}
+.pattern-kw{font-size:2rem;color:var(--accent);font-weight:800;letter-spacing:4px;margin-bottom:6px;}
+.pattern-en{font-size:0.82rem;color:var(--text2);}
+.pattern-eg{background:var(--card-bg);border-left:4px solid var(--accent);padding:12px 14px;border-radius:0 10px 10px 0;margin-bottom:8px;cursor:pointer;}
+.pattern-eg .peg-cn{font-size:1.05rem;color:var(--text);font-weight:600;}
+.pattern-eg .peg-py{font-size:0.72rem;color:var(--accent2);margin-top:2px;}
+.pattern-eg .peg-en{font-size:0.78rem;color:var(--text2);margin-top:2px;font-style:italic;}
+.fill-item{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;}
+.fill-item .fill-q{font-size:1rem;color:var(--text);margin-bottom:8px;}
+.fill-input{border:2px solid var(--border2);border-radius:8px;padding:6px 12px;font-size:1rem;color:var(--text);background:var(--stroke-area-bg);width:100%;max-width:320px;}
+.fill-input.correct-ans{border-color:#43a047;background:rgba(67,160,71,0.1);}
+.fill-input.wrong-ans{border-color:#e53935;background:rgba(229,57,53,0.08);}
+.transform-item{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;}
+.transform-item .tx-label{font-size:0.72rem;color:var(--text2);margin-bottom:4px;font-weight:700;}
+.transform-item .tx-q{font-size:1rem;color:var(--accent2);margin-bottom:8px;}
+.tx-input{border:2px solid var(--border2);border-radius:8px;padding:6px 12px;font-size:0.95rem;color:var(--text);background:var(--stroke-area-bg);width:100%;}
+.tx-input.correct-ans{border-color:#43a047;background:rgba(67,160,71,0.1);}
+.tx-input.wrong-ans{border-color:#e53935;background:rgba(229,57,53,0.08);}
+.ex-result{margin-top:8px;font-size:0.8rem;min-height:18px;}
+/* ── READING TAB (扩展阅读) ── */
+.read-controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+
 </style>
 </head>
 <body>
@@ -236,6 +260,8 @@ header h1 span{font-size:0.9rem;color:rgba(255,255,255,0.8);display:block;margin
   <button class="tab-btn" onclick="switchTab('chars',this)">✍️ 生字</button>
   <button class="tab-btn" onclick="switchTab('vocab',this)">📚 词语</button>
   <button class="tab-btn" onclick="switchTab('dialogue',this)">💬 对话</button>
+  <button class="tab-btn" onclick="switchTab('pattern',this)">📝 句型</button>
+  <button class="tab-btn" onclick="switchTab('reading',this)">📖 扩展阅读</button>
   <button class="tab-btn" onclick="switchTab('bingo',this)">🎯 宾果</button>
   <button class="tab-btn" onclick="switchTab('games',this)">🎮 游戏</button>
   <button class="tab-btn" onclick="switchTab('recording',this)">🎤 录音</button>
@@ -382,7 +408,60 @@ header h1 span{font-size:0.9rem;color:rgba(255,255,255,0.8);display:block;margin
   <div class="card" id="dlgLines"></div>
 </div>
 
-<!-- TAB 5: BINGO -->
+
+<!-- TAB 5: SENTENCE PATTERN (句型) -->
+<div id="tab-pattern" class="tab-panel">
+  <div class="card">
+    <div class="section-title">📝 句型学习 · Sentence Pattern</div>
+    <div class="pattern-display" id="patternDisplay"></div>
+    <div id="patternExamples"></div>
+  </div>
+  <div class="card">
+    <div class="section-title">✏️ 填空练习 · Fill in the Blank</div>
+    <div id="fillExercise"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+      <button class="btn btn-primary btn-sm" onclick="checkFill()">✔ 检查答案</button>
+      <button class="btn btn-secondary btn-sm" onclick="resetFill()">↺ 重置</button>
+    </div>
+    <div class="ex-result" id="fillResult"></div>
+  </div>
+  <div class="card">
+    <div class="section-title">🔄 句型转换 · Transform the Sentence</div>
+    <div id="transformEx"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+      <button class="btn btn-primary btn-sm" onclick="checkTransform()">✔ 检查答案</button>
+      <button class="btn btn-secondary btn-sm" onclick="resetTransform()">↺ 重置</button>
+    </div>
+    <div class="ex-result" id="transformResult"></div>
+  </div>
+</div>
+
+
+<!-- TAB 6: EXTENDED READING (扩展阅读) -->
+<div id="tab-reading" class="tab-panel">
+  <div class="card">
+    <div class="section-title">📗 扩展阅读 · Extended Reading</div>
+    <div class="read-controls">
+      <button class="btn btn-primary btn-sm" id="readPlayBtn" onclick="readPlay()">▶ 朗读</button>
+      <button class="btn btn-secondary btn-sm" id="readPauseBtn" onclick="readPause()" disabled style="opacity:.5">⏸ 暂停</button>
+      <button class="btn btn-secondary btn-sm" id="readStopBtn" onclick="readStop()" disabled style="opacity:.5">⏹ 停止</button>
+      <button class="btn btn-secondary btn-sm" onclick="toggleReadPY()">🔤 拼音</button>
+    </div>
+    <div class="story-text" id="readText"></div>
+  </div>
+  <div class="card">
+    <div class="section-title">❓ 阅读理解 · Comprehension</div>
+    <div id="comprehension"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+      <button class="btn btn-primary btn-sm" onclick="checkComp()">✔ 检查答案</button>
+      <button class="btn btn-secondary btn-sm" onclick="resetComp()">↺ 重置</button>
+    </div>
+    <div class="ex-result" id="compResult"></div>
+  </div>
+</div>
+
+
+<!-- TAB 7: BINGO -->
 <div id="tab-bingo" class="tab-panel">
   <div class="card">
     <div class="bingo-compact">
@@ -407,7 +486,7 @@ header h1 span{font-size:0.9rem;color:rgba(255,255,255,0.8);display:block;margin
   </div>
 </div>
 
-<!-- TAB 6: GAMES -->
+<!-- TAB 8: GAMES -->
 <div id="tab-games" class="tab-panel">
   <div class="game-selector">
     <button class="game-btn active" onclick="selGame('quiz',this)">
@@ -445,7 +524,7 @@ header h1 span{font-size:0.9rem;color:rgba(255,255,255,0.8);display:block;margin
   </div>
 </div>
 
-<!-- TAB 7: RECORDING -->
+<!-- TAB 9: RECORDING -->
 <div id="tab-recording" class="tab-panel">
   <div class="card">
     <div class="section-title">🎤 朗读练习</div>
@@ -707,8 +786,53 @@ function speak(txt,rate=0.85,cb=null){
   return u;
 }
 
+
+// ── 句型数据 (Lesson 3) ─────────────────────────────────────────────────
+const PATTERN_KW = '有一点儿…';
+const PATTERN_ZH = '表示程度不深，稍微有一点的感觉 · Expresses a slight degree ("a little bit")';
+const PATTERN_EG_CN = '我有一点儿不舒服。';
+const PATTERN_EG_PY = 'Wǒ yǒu yīdiǎnr bù shūfu.';
+const PATTERN_EG_EN = 'I feel a little unwell.';
+const PATTERN_EXAMPLES = [
+  {cn:'我今天有一点儿发烧。',py:'Wǒ jīntiān yǒu yīdiǎnr fāshāo.',en:'I have a slight fever today.'},
+  {cn:'量体温有一点儿凉。',py:'Liáng tǐwēn yǒu yīdiǎnr liáng.',en:'Taking the temperature is a little cold.'},
+  {cn:'打针有一点儿疼，但很快就好了。',py:'Dǎ zhēn yǒu yīdiǎnr téng, dàn hěn kuài jiù hǎo le.',en:'The injection hurts a little, but it gets better quickly.'},
+  {cn:'吃了药，身体有一点儿好多了。',py:'Chī le yào, shēntǐ yǒu yīdiǎnr hǎo duō le.',en:'After taking medicine, I feel a little better.'},
+];
+const FILL_EXERCISES = [
+  {before:'我喉咙___疼，', after:'请给我看一看。',answer:'有一点儿',hint:'填"有一点儿"'},
+  {before:'这个药___苦，', after:'但是吃了很有用。',answer:'有一点儿',hint:'程度不深，稍微'},
+  {before:'今天天气___冷，', after:'要多穿衣服。',answer:'有一点儿',hint:'用"有一点儿"表示稍微'},
+];
+const TRANSFORM_EXERCISES = [
+  {statement:'我稍微有点发烧。（用"有一点儿"改写）',answer:'我有一点儿发烧。'},
+  {statement:'打针稍微有点疼。（用"有一点儿"改写）',answer:'打针有一点儿疼。'},
+  {statement:'我的手臂稍微有点不舒服。（用"有一点儿"改写）',answer:'我的手臂有一点儿不舒服。'},
+];
+// ── 扩展阅读数据 (Lesson 3) ─────────────────────────────────────────────
+const READING = [
+  {ch:['小','明','今','天','有','一','点','儿','不','舒','服','。'],
+   py:['Xiǎo','míng','jīn','tiān','yǒu','yī','diǎn','r','bù','shū','fu','。']},
+  {ch:['妈','妈','带','他','去','了','医','院','。'],
+   py:['māma','dài','tā','qù','le','yī','yuàn','。']},
+  {ch:['医','生','给','小','明','量','了','体','温','，','说','他','有','一','点','儿','发','烧','。'],
+   py:['yī','shēng','gěi','Xiǎo','míng','liáng','le','tǐ','wēn','，','shuō','tā','yǒu','yī','diǎn','r','fā','shāo','。']},
+  {ch:['医','生','让','他','打','了','一','针','，','还','开','了','一','些','药','。'],
+   py:['yī','shēng','ràng','tā','dǎ','le','yī','zhēn','，','hái','kāi','le','yī','xiē','yào','。']},
+  {ch:['小','明','按','时','吃','药','，','第','二','天','就','好','多','了','。'],
+   py:['Xiǎo','míng','àn','shí','chī','yào','，','dì','èr','tiān','jiù','hǎo','duō','le','。']},
+  {ch:['生','病','了','要','去','看','医','生','，','不','能','乱','吃','药','！'],
+   py:['shēng','bìng','le','yào','qù','kàn','yī','shēng','，','bù','néng','luàn','chī','yào','！']},
+];
+const COMP_QUESTIONS = [
+  {q:'小明怎么了？',opts:['他摔倒了','他有一点儿不舒服','他很饿','他迷路了'],answer:1},
+  {q:'医生说小明怎么了？',opts:['骨折了','有一点儿发烧','肚子疼','没有问题'],answer:1},
+  {q:'医生给小明做了什么？',opts:['只量了体温','打了针还开了药','只开了药','让他回家休息'],answer:1},
+  {q:'小明什么时候好多了？',opts:['当天就好了','第二天','第三天','过了一周'],answer:1},
+];
+
 // ── TABS ─────────────────────────────────────────────────
-let charsBuilt=false,dlgBuilt=false,bingoBuilt=false,recBuilt=false,gamesInit=false;
+let charsBuilt=false,dlgBuilt=false,bingoBuilt=false,recBuilt=false,gamesInit=false,patternBuilt=false,readingBuilt=false;
 function switchTab(id,btn){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
@@ -717,6 +841,8 @@ function switchTab(id,btn){
   if(id==='chars'&&!charsBuilt){buildCharGrid();charsBuilt=true;}
   if(id==='vocab')initFlashcards();
   if(id==='dialogue'&&!dlgBuilt){buildDialogue();dlgBuilt=true;}
+  if(id==='pattern'&&!patternBuilt){buildPattern();patternBuilt=true;}
+  if(id==='reading'&&!readingBuilt){buildReading();readingBuilt=true;}
   if(id==='bingo'&&!bingoBuilt){initBingo();bingoBuilt=true;}
   if(id==='games'&&!gamesInit){startQuizGame();startRocket();gamesInit=true;}
   if(id==='recording'&&!recBuilt){buildRecSents();recBuilt=true;}
@@ -1193,6 +1319,175 @@ function launchConfetti(){
 
 // ── INIT ─────────────────────────────────────────────────
 buildStory();
+
+// ── PATTERN TAB ─────────────────────────────────────────────────────────────
+function buildPattern(){
+  // Pattern display
+  const pd=document.getElementById('patternDisplay');
+  if(pd&&!pd.dataset.built){
+    pd.innerHTML='<div class="pattern-kw">'+PATTERN_KW+'</div><div style="font-size:1rem;color:var(--text2);margin-bottom:4px;">'+PATTERN_ZH+'</div><button class="btn btn-secondary btn-sm" style="margin-top:6px;" onclick="speak(PATTERN_EG_CN)">🔊 听例句</button><div style="font-size:0.88rem;color:var(--text);margin-top:8px;font-style:italic;">'+PATTERN_EG_PY+'</div><div style="font-size:0.88rem;color:var(--accent2);margin-top:2px;">'+PATTERN_EG_CN+'</div><div style="font-size:0.78rem;color:var(--text2);margin-top:2px;">'+PATTERN_EG_EN+'</div>';
+    pd.dataset.built='1';
+  }
+  // Examples list
+  const pe=document.getElementById('patternExamples');
+  if(pe&&!pe.dataset.built){
+    pe.innerHTML='<div class="section-title" style="margin-bottom:8px;">📚 更多例句 · More Examples</div>'+
+      PATTERN_EXAMPLES.map(e=>'<div class="pattern-eg" onclick="speak(''+e.cn+'')"><div class="peg-cn">'+e.cn+'</div><div class="peg-py">'+e.py+'</div><div class="peg-en">'+e.en+'</div></div>').join('');
+    pe.dataset.built='1';
+  }
+  // Fill exercises
+  const fe=document.getElementById('fillExercise');
+  if(fe&&!fe.dataset.built){
+    fe.innerHTML=FILL_EXERCISES.map((f,i)=>
+      '<div class="fill-item"><div class="fill-q">'+f.before+'<input class="fill-input" id="fill'+i+'" placeholder="填入答案" autocomplete="off">'+f.after+'</div><div style="font-size:0.72rem;color:var(--text2);margin-top:3px;">'+f.hint+'</div></div>'
+    ).join('');
+    fe.dataset.built='1';
+  }
+  // Transform exercises
+  const te=document.getElementById('transformEx');
+  if(te&&!te.dataset.built){
+    te.innerHTML=TRANSFORM_EXERCISES.map((t,i)=>
+      '<div class="transform-item"><div class="tx-label">把下面的句子改成用"'+PATTERN_KW+'"的句型：</div><div class="tx-q">'+t.statement+'</div><input class="tx-input" id="tx'+i+'" placeholder="写出你的答案" autocomplete="off"></div>'
+    ).join('');
+    te.dataset.built='1';
+  }
+}
+function checkFill(){
+  let ok=0;
+  FILL_EXERCISES.forEach((f,i)=>{
+    const inp=document.getElementById('fill'+i);
+    if(!inp)return;
+    const v=inp.value.trim();
+    if(v===f.answer){inp.className='fill-input correct-ans';ok++;}
+    else{inp.className='fill-input wrong-ans';}
+  });
+  document.getElementById('fillResult').innerHTML=ok===FILL_EXERCISES.length?
+    '<span style="color:#43a047;font-weight:700">🎉 全对！太棒了！All correct!</span>':
+    '<span style="color:#e53935;">还有 '+(FILL_EXERCISES.length-ok)+' 题不对，再试试！</span>';
+  if(ok===FILL_EXERCISES.length)confetti(40);
+}
+function resetFill(){
+  FILL_EXERCISES.forEach((f,i)=>{const inp=document.getElementById('fill'+i);if(inp){inp.value='';inp.className='fill-input';}});
+  document.getElementById('fillResult').innerHTML='';
+}
+function checkTransform(){
+  let ok=0;
+  TRANSFORM_EXERCISES.forEach((t,i)=>{
+    const inp=document.getElementById('tx'+i);
+    if(!inp)return;
+    const v=inp.value.trim();
+    // Accept if the answer contains key words
+    const correct=t.answer.replace(/[，。！？]/g,'');
+    const userVal=v.replace(/[，。！？]/g,'');
+    if(userVal===correct||v===t.answer){inp.className='tx-input correct-ans';ok++;}
+    else{inp.className='tx-input wrong-ans';}
+  });
+  document.getElementById('transformResult').innerHTML=ok===TRANSFORM_EXERCISES.length?
+    '<span style="color:#43a047;font-weight:700">🎉 全对！太棒了！</span>':
+    '<span style="color:#e53935;">答案参考：'+TRANSFORM_EXERCISES.map(t=>t.answer).join(' / ')+'</span>';
+  if(ok===TRANSFORM_EXERCISES.length)confetti(40);
+}
+function resetTransform(){
+  TRANSFORM_EXERCISES.forEach((t,i)=>{const inp=document.getElementById('tx'+i);if(inp){inp.value='';inp.className='tx-input';}});
+  document.getElementById('transformResult').innerHTML='';
+}
+// ── READING TAB ─────────────────────────────────────────────────────────────
+let readShowPY=true,readPlaying=false,readStopped=false,readIdx=0;
+function buildReading(){
+  const el=document.getElementById('readText');
+  if(!el||el.dataset.built)return;
+  el.innerHTML='';
+  READING.forEach((para,pi)=>{
+    const div=document.createElement('div');
+    div.className='story-para';div.dataset.pi=pi;
+    para.ch.forEach((ch,ci)=>{
+      const s=document.createElement('span');
+      s.className='pb';s.dataset.pi=pi;s.dataset.ci=ci;
+      s.innerHTML='<span class="py">'+(readShowPY?para.py[ci]:'&nbsp;')+'</span><span class="ch">'+ch+'</span>';
+      s.onclick=()=>speak(ch);
+      div.appendChild(s);
+    });
+    el.appendChild(div);
+  });
+  el.dataset.built='1';
+  // Comprehension
+  buildComp();
+}
+function toggleReadPY(){
+  readShowPY=!readShowPY;
+  document.querySelectorAll('#readText .pb').forEach(s=>{
+    const pi=+s.dataset.pi,ci=+s.dataset.ci;
+    s.querySelector('.py').textContent=readShowPY?READING[pi].py[ci]:' ';
+  });
+}
+function readPlay(){
+  if(!document.getElementById('readText').dataset.built)buildReading();
+  readStopped=false;readPlaying=true;
+  document.getElementById('readPlayBtn').disabled=true;document.getElementById('readPlayBtn').style.opacity='.5';
+  document.getElementById('readPauseBtn').disabled=false;document.getElementById('readPauseBtn').style.opacity='1';
+  document.getElementById('readStopBtn').disabled=false;document.getElementById('readStopBtn').style.opacity='1';
+  const text=READING.map(p=>p.ch.join('')).join('，');
+  synth.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='zh-CN';u.rate=0.85;
+  if(zhVoice)u.voice=zhVoice;
+  u.onend=()=>{readPlaying=false;resetReadBtns();};
+  u.onerror=()=>{readPlaying=false;resetReadBtns();};
+  synth.speak(u);
+}
+function readPause(){
+  if(synth.speaking&&!synth.paused){synth.pause();document.getElementById('readPauseBtn').textContent='▶ 继续';}
+  else if(synth.paused){synth.resume();document.getElementById('readPauseBtn').textContent='⏸ 暂停';}
+}
+function readStop(){
+  synth.cancel();readPlaying=false;readStopped=true;resetReadBtns();
+}
+function resetReadBtns(){
+  document.getElementById('readPlayBtn').disabled=false;document.getElementById('readPlayBtn').style.opacity='1';
+  document.getElementById('readPauseBtn').disabled=true;document.getElementById('readPauseBtn').style.opacity='.5';
+  document.getElementById('readPauseBtn').textContent='⏸ 暂停';
+  document.getElementById('readStopBtn').disabled=true;document.getElementById('readStopBtn').style.opacity='.5';
+}
+let builtComp=false;
+function buildComp(){
+  if(builtComp)return;builtComp=true;
+  const el=document.getElementById('comprehension');
+  if(!el)return;
+  el.innerHTML=COMP_QUESTIONS.map((q,qi)=>
+    '<div style="background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;">' +
+    '<div style="font-size:1rem;color:var(--text);font-weight:600;margin-bottom:8px;">'+(qi+1)+'、'+q.q+'</div>'+
+    q.opts.map((o,oi)=>
+      '<label style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;margin-bottom:4px;background:var(--stroke-area-bg);">'+
+      '<input type="radio" name="comp'+qi+'" value="'+oi+'"> '+
+      '<span style="font-size:0.92rem;color:var(--text);">'+o+'</span></label>'
+    ).join('')+
+    '</div>'
+  ).join('');
+}
+function checkComp(){
+  if(!builtComp)buildComp();
+  let ok=0;
+  COMP_QUESTIONS.forEach((q,qi)=>{
+    const sel=document.querySelector('input[name="comp'+qi+'"]:checked');
+    const labels=document.querySelectorAll('label[style*="margin-bottom"] input[name="comp'+qi+'"]');
+    document.querySelectorAll('input[name="comp'+qi+'"]').forEach((inp,oi)=>{
+      inp.parentElement.style.background=oi===q.answer?'rgba(67,160,71,0.12)':oi===(sel&&+sel.value)?'rgba(229,57,53,0.1)':'var(--stroke-area-bg)';
+    });
+    if(sel&&+sel.value===q.answer)ok++;
+  });
+  document.getElementById('compResult').innerHTML=ok===COMP_QUESTIONS.length?
+    '<span style="color:#43a047;font-weight:700">🎉 全对！优秀！</span>':
+    '<span style="color:#e53935;">答对 '+ok+'/'+COMP_QUESTIONS.length+' 题，绿色是正确答案。</span>';
+  if(ok===COMP_QUESTIONS.length)confetti(40);
+}
+function resetComp(){
+  document.querySelectorAll('.tab-panel input[type=radio]').forEach(i=>{
+    i.checked=false;
+    i.parentElement.style.background='var(--stroke-area-bg)';
+  });
+  document.getElementById('compResult').innerHTML='';
+}
+
 </script>
 </body>
 </html>

@@ -288,11 +288,36 @@ header h1{
 footer{
   position:relative;z-index:5;
   text-align:center;
-  padding:20px;
-  font-size:0.8rem;
-  color:#7ab0cc;
-  border-top:1px solid rgba(2,119,189,0.12);
-  background:#fff;
+  padding:22px 20px;
+  background:#1e6b22;
+  box-shadow:0 -2px 12px rgba(0,0,0,0.15);
+}
+.footer-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  background:rgba(255,255,255,0.12);
+  border:1px solid rgba(255,255,255,0.25);
+  border-radius:20px;
+  padding:4px 14px 4px 10px;
+  font-size:0.75rem;
+  color:rgba(255,255,255,0.9);
+  letter-spacing:1.5px;
+  margin-bottom:10px;
+}
+.footer-badge .badge-grid{
+  width:12px;height:12px;
+}
+.footer-main{
+  font-size:0.82rem;
+  color:rgba(255,255,255,0.85);
+  letter-spacing:0.5px;
+  margin-bottom:4px;
+}
+.footer-sub{
+  font-size:0.72rem;
+  color:rgba(255,255,255,0.55);
+  letter-spacing:0.5px;
 }
 </style>
 </head>
@@ -416,13 +441,13 @@ footer{
       <span class="card-tag">✓ 开放</span>
     </a>
 
-    <a href="lesson4.html" class="lesson-card coming-soon" style="--stripe:#039be5">
+    <a href="lesson4.html" class="lesson-card available" style="--stripe:#fb8c00">
       <div class="card-num">第 4 课</div>
-      <span class="card-emoji">🏃</span>
-      <div class="card-cn">快乐运动</div>
-      <div class="card-py">kuàilè yùndòng</div>
-      <div class="card-en">Happy Exercise</div>
-      <span class="card-tag">即将开放</span>
+      <span class="card-emoji">🐝</span>
+      <div class="card-cn">猜一猜</div>
+      <div class="card-py">cāi yi cāi</div>
+      <div class="card-en">Make a Guess</div>
+      <span class="card-tag">✓ 开放</span>
     </a>
 
   </div>
@@ -552,8 +577,17 @@ footer{
 </div>
 
 <footer>
-  中文小学版 第三册 · Chinese Language Elementary Book 3 · Interactive Learning Tool<br>
-  Built for 北美妈妈说 · 9 interactive tabs per lesson · Works offline
+  <div class="footer-badge">
+    <div class="badge-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:2px;flex-shrink:0;">
+      <span style="background:#f44336;border-radius:2px;display:block;"></span>
+      <span style="background:#2196f3;border-radius:2px;display:block;"></span>
+      <span style="background:#ffeb3b;border-radius:2px;display:block;"></span>
+      <span style="background:#4caf50;border-radius:2px;display:block;"></span>
+    </div>
+    中文·第三册
+  </div>
+  <div class="footer-main">中文小学版 第三册 · Chinese Language Elementary Book 3 · Interactive Learning Tool</div>
+  <div class="footer-sub">Built for 北美妈妈说 · 9 interactive tabs per lesson · Works offline · 🚦 📚 🏥 🐝 🌍</div>
 </footer>
 
 <script>

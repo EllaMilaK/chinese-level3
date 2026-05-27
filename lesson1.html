@@ -1368,58 +1368,174 @@ function launchConfetti(){
 // ── INIT ─────────────────────────────────────────────
 buildStory();
 
+
 // __ PATTERN TAB __
 function buildPattern(){
-  const pd=document.getElementById("patternDisplay");
+  var pd=document.getElementById('patternDisplay');
   if(pd&&!pd.dataset.built){
-    pd.innerHTML="<div class="pattern-kw">"+PATTERN_KW+"</div><div style="font-size:1rem;color:var(--text2);margin-bottom:4px;">"+PATTERN_ZH+"</div><button class="btn btn-secondary btn-sm" style="margin-top:6px;" onclick="speak(PATTERN_EG_CN)">🔊 听例句</button><div style="font-size:0.88rem;color:var(--text);margin-top:8px;font-style:italic;">"+PATTERN_EG_PY+"</div><div style="font-size:0.88rem;color:var(--accent2);margin-top:2px;">"+PATTERN_EG_CN+"</div><div style="font-size:0.78rem;color:var(--text2);margin-top:2px;">"+PATTERN_EG_EN+"</div>";
-    pd.dataset.built="1";
+    pd.innerHTML='<div class="pattern-kw">'+PATTERN_KW+'</div>'
+      +'<div style="font-size:1rem;color:var(--text2);margin-bottom:4px;">'+PATTERN_ZH+'</div>'
+      +'<button class="btn btn-secondary btn-sm" style="margin-top:6px;" onclick="speak(PATTERN_EG_CN)">🔊 听例句</button>'
+      +'<div style="font-size:0.88rem;color:var(--text);margin-top:8px;font-style:italic;">'+PATTERN_EG_PY+'</div>'
+      +'<div style="font-size:0.88rem;color:var(--accent2);margin-top:2px;">'+PATTERN_EG_CN+'</div>'
+      +'<div style="font-size:0.78rem;color:var(--text2);margin-top:2px;">'+PATTERN_EG_EN+'</div>';
+    pd.dataset.built='1';
   }
-  const pe=document.getElementById("patternExamples");
+  var pe=document.getElementById('patternExamples');
   if(pe&&!pe.dataset.built){
-    pe.innerHTML="<div class="section-title" style="margin-bottom:8px;">📚 更多例句 · More Examples</div>"+PATTERN_EXAMPLES.map(e=>"<div class="pattern-eg" onclick="speak("+JSON.stringify(e.cn)+")"><div class="peg-cn">"+e.cn+"</div><div class="peg-py">"+e.py+"</div><div class="peg-en">"+e.en+"</div></div>").join("");
-    pe.dataset.built="1";
+    pe.innerHTML='<div class="section-title" style="margin-bottom:8px;">📚 更多例句 · More Examples</div>'
+      +PATTERN_EXAMPLES.map(function(e){
+        return '<div class="pattern-eg" onclick="speak('+JSON.stringify(e.cn)+')">'
+          +'<div class="peg-cn">'+e.cn+'</div>'
+          +'<div class="peg-py">'+e.py+'</div>'
+          +'<div class="peg-en">'+e.en+'</div></div>';
+      }).join('');
+    pe.dataset.built='1';
   }
-  const fe=document.getElementById("fillExercise");
+  var fe=document.getElementById('fillExercise');
   if(fe&&!fe.dataset.built){
-    fe.innerHTML=FILL_EXERCISES.map((f,i)=>"<div class="fill-item"><div class="fill-q">"+f.before+"<input class="fill-input" id="fill"+i placeholder="填入答案" autocomplete="off">"+f.after+"</div><div style="font-size:0.72rem;color:var(--text2);margin-top:3px;">"+f.hint+"</div></div>").join("");
-    fe.dataset.built="1";
+    fe.innerHTML=FILL_EXERCISES.map(function(f,i){
+      return '<div class="fill-item"><div class="fill-q">'+f.before
+        +'<input class="fill-input" id="fill'+i+'" placeholder="填入答案" autocomplete="off">'
+        +f.after+'</div><div style="font-size:0.72rem;color:var(--text2);margin-top:3px;">'+f.hint+'</div></div>';
+    }).join('');
+    fe.dataset.built='1';
   }
-  const te=document.getElementById("transformEx");
+  var te=document.getElementById('transformEx');
   if(te&&!te.dataset.built){
-    te.innerHTML=TRANSFORM_EXERCISES.map((t,i)=>"<div class="transform-item"><div class="tx-label">把下面的句子改成用""+PATTERN_KW+""的句型：</div><div class="tx-q">"+t.statement+"</div><input class="tx-input" id="tx"+i placeholder="写出你的答案" autocomplete="off"></div>").join("");
-    te.dataset.built="1";
+    te.innerHTML=TRANSFORM_EXERCISES.map(function(t,i){
+      return '<div class="transform-item">'
+        +'<div class="tx-label">把下面的句子改成用“'+PATTERN_KW+'”的句型：</div>'
+        +'<div class="tx-q">'+t.statement+'</div>'
+        +'<input class="tx-input" id="tx'+i+'" placeholder="写出你的答案" autocomplete="off">'
+        +'</div>';
+    }).join('');
+    te.dataset.built='1';
   }
 }
-function checkFill(){var ok=0;FILL_EXERCISES.forEach(function(f,i){var inp=document.getElementById("fill"+i);if(!inp)return;if(inp.value.trim()===f.answer){inp.className="fill-input correct-ans";ok++;}else{inp.className="fill-input wrong-ans";}});document.getElementById("fillResult").innerHTML=ok===FILL_EXERCISES.length?"<span style="color:#43a047;font-weight:700">🎉 全对！太棒了！</span>":"<span style="color:#e53935;">还有"+(FILL_EXERCISES.length-ok)+"题不对，再试试！</span>";if(ok===FILL_EXERCISES.length)confetti(40);}
-function resetFill(){FILL_EXERCISES.forEach(function(f,i){var inp=document.getElementById("fill"+i);if(inp){inp.value="";inp.className="fill-input";}});document.getElementById("fillResult").innerHTML="";}
-function checkTransform(){var ok=0;TRANSFORM_EXERCISES.forEach(function(t,i){var inp=document.getElementById("tx"+i);if(!inp)return;var v=inp.value.trim().replace(/[，。！？]/g,""),c=t.answer.replace(/[，。！？]/g,"");if(v===c){inp.className="tx-input correct-ans";ok++;}else{inp.className="tx-input wrong-ans";}});document.getElementById("transformResult").innerHTML=ok===TRANSFORM_EXERCISES.length?"<span style="color:#43a047;font-weight:700">🎉 全对！</span>":"<span style="color:#e53935;">答案参考："+TRANSFORM_EXERCISES.map(function(t){return t.answer;}).join(" / ")+"</span>";if(ok===TRANSFORM_EXERCISES.length)confetti(40);}
-function resetTransform(){TRANSFORM_EXERCISES.forEach(function(t,i){var inp=document.getElementById("tx"+i);if(inp){inp.value="";inp.className="tx-input";}});document.getElementById("transformResult").innerHTML="";}
-// __ READING TAB __
-var readShowPY=true,readPlaying2=false;
-function buildReading(){
-  var el=document.getElementById("readText");
-  if(!el||el.dataset.built)return;
-  el.innerHTML="";
-  READING.forEach(function(para,pi){
-    var div=document.createElement("div");div.className="story-para";div.dataset.pi=pi;
-    para.ch.forEach(function(ch,ci){
-      var s=document.createElement("span");s.className="pb";s.dataset.pi=pi;s.dataset.ci=ci;
-      s.innerHTML="<span class="py">"+(readShowPY?para.py[ci]:"&nbsp;")+"</span><span class="ch">"+ch+"</span>";
-      s.onclick=function(){speak(ch);};div.appendChild(s);
-    });el.appendChild(div);
+function checkFill(){
+  var ok=0;
+  FILL_EXERCISES.forEach(function(f,i){
+    var inp=document.getElementById('fill'+i);
+    if(!inp)return;
+    if(inp.value.trim()===f.answer){inp.className='fill-input correct-ans';ok++;}
+    else{inp.className='fill-input wrong-ans';}
   });
-  el.dataset.built="1";buildComp();
+  document.getElementById('fillResult').innerHTML=ok===FILL_EXERCISES.length
+    ?'<span style="color:#43a047;font-weight:700">🎉 全对！太棒了！</span>'
+    :'<span style="color:#e53935;">还有'+(FILL_EXERCISES.length-ok)+'题不对，再试试！</span>';
+  if(ok===FILL_EXERCISES.length)launchConfetti();
 }
-function toggleReadPY(){readShowPY=!readShowPY;document.querySelectorAll("#readText .pb").forEach(function(s){var pi=+s.dataset.pi,ci=+s.dataset.ci;s.querySelector(".py").textContent=readShowPY?READING[pi].py[ci]:" ";});}
-function readPlay(){if(!document.getElementById("readText").dataset.built)buildReading();document.getElementById("readPlayBtn").disabled=true;document.getElementById("readPlayBtn").style.opacity=".5";document.getElementById("readPauseBtn").disabled=false;document.getElementById("readPauseBtn").style.opacity="1";document.getElementById("readStopBtn").disabled=false;document.getElementById("readStopBtn").style.opacity="1";var text=READING.map(function(p){return p.ch.join("");}).join("，");synth.cancel();var u=new SpeechSynthesisUtterance(text);u.lang="zh-CN";u.rate=0.85;if(zhVoice)u.voice=zhVoice;u.onend=function(){resetReadBtns2();};u.onerror=function(){resetReadBtns2();};synth.speak(u);}
-function readPause(){if(synth.speaking&&!synth.paused){synth.pause();document.getElementById("readPauseBtn").textContent="▶ 继续";}else if(synth.paused){synth.resume();document.getElementById("readPauseBtn").textContent="⏸ 暂停";}}
-function readStop(){synth.cancel();resetReadBtns2();}
-function resetReadBtns2(){document.getElementById("readPlayBtn").disabled=false;document.getElementById("readPlayBtn").style.opacity="1";document.getElementById("readPauseBtn").disabled=true;document.getElementById("readPauseBtn").style.opacity=".5";document.getElementById("readPauseBtn").textContent="⏸ 暂停";document.getElementById("readStopBtn").disabled=true;document.getElementById("readStopBtn").style.opacity=".5";}
+function resetFill(){
+  FILL_EXERCISES.forEach(function(f,i){var inp=document.getElementById('fill'+i);if(inp){inp.value='';inp.className='fill-input';}});
+  document.getElementById('fillResult').innerHTML='';
+}
+function checkTransform(){
+  var ok=0;
+  TRANSFORM_EXERCISES.forEach(function(t,i){
+    var inp=document.getElementById('tx'+i);if(!inp)return;
+    var v=inp.value.trim().replace(/[，。！？]/g,''),c=t.answer.replace(/[，。！？]/g,'');
+    if(v===c){inp.className='tx-input correct-ans';ok++;}
+    else{inp.className='tx-input wrong-ans';}
+  });
+  document.getElementById('transformResult').innerHTML=ok===TRANSFORM_EXERCISES.length
+    ?'<span style="color:#43a047;font-weight:700">🎉 全对！</span>'
+    :'<span style="color:#e53935;">答案参考：'+TRANSFORM_EXERCISES.map(function(t){return t.answer;}).join(' / ')+'</span>';
+  if(ok===TRANSFORM_EXERCISES.length)launchConfetti();
+}
+function resetTransform(){
+  TRANSFORM_EXERCISES.forEach(function(t,i){var inp=document.getElementById('tx'+i);if(inp){inp.value='';inp.className='tx-input';}});
+  document.getElementById('transformResult').innerHTML='';
+}
+// __ READING TAB __
+var readShowPY=true,readPlaying2=false,readIdx2=0,readPaused2=false;
+function buildReading(){
+  var el=document.getElementById('readText');
+  if(!el||el.dataset.built)return;
+  el.innerHTML='';
+  READING.forEach(function(para,pi){
+    var div=document.createElement('div');div.className='story-para';div.dataset.pi=pi;
+    para.ch.forEach(function(ch,ci){
+      var s=document.createElement('span');s.className='pb';s.dataset.pi=pi;s.dataset.ci=ci;
+      var py=para.py[ci]||'';
+      if(/[，。！？、：；""''（）【】…—]/.test(ch)){
+        s.innerHTML='<span class="py" style="visibility:hidden">'+( py||'　')+'</span><span class="ch">'+ch+'</span>';
+      } else {
+        s.innerHTML='<span class="py" style="visibility:'+(readShowPY?'visible':'hidden')+'">'+py+'</span><span class="ch">'+ch+'</span>';
+        s.onclick=function(){speak(ch);};
+      }
+      div.appendChild(s);
+    });
+    el.appendChild(div);
+  });
+  el.dataset.built='1';
+  buildComp();
+}
+function toggleReadPY(){
+  readShowPY=!readShowPY;
+  document.querySelectorAll('#readText .pb').forEach(function(s){
+    var pi=+s.dataset.pi,ci=+s.dataset.ci;
+    var pyEl=s.querySelector('.py');
+    if(pyEl)pyEl.style.visibility=readShowPY?'visible':'hidden';
+  });
+}
+function readPlay(){
+  if(!document.getElementById('readText').dataset.built)buildReading();
+  document.getElementById('readPlayBtn').disabled=true;document.getElementById('readPlayBtn').style.opacity='.5';
+  document.getElementById('readPauseBtn').disabled=false;document.getElementById('readPauseBtn').style.opacity='1';
+  document.getElementById('readStopBtn').disabled=false;document.getElementById('readStopBtn').style.opacity='1';
+  var text=READING.map(function(p){return p.ch.join('');}).join('，');
+  speechSynthesis.cancel();
+  var u=new SpeechSynthesisUtterance(text);u.lang='zh-CN';u.rate=0.85;
+  if(zhVoice)u.voice=zhVoice;
+  u.onend=function(){resetReadBtns2();};u.onerror=function(){resetReadBtns2();};
+  speechSynthesis.speak(u);
+}
+function readPause(){
+  if(speechSynthesis.speaking&&!speechSynthesis.paused){speechSynthesis.pause();document.getElementById('readPauseBtn').textContent='▶ 继续';}
+  else if(speechSynthesis.paused){speechSynthesis.resume();document.getElementById('readPauseBtn').textContent='⏸ 暂停';}
+}
+function readStop(){speechSynthesis.cancel();resetReadBtns2();}
+function resetReadBtns2(){
+  document.getElementById('readPlayBtn').disabled=false;document.getElementById('readPlayBtn').style.opacity='1';
+  document.getElementById('readPauseBtn').disabled=true;document.getElementById('readPauseBtn').style.opacity='.5';
+  document.getElementById('readPauseBtn').textContent='⏸ 暂停';
+  document.getElementById('readStopBtn').disabled=true;document.getElementById('readStopBtn').style.opacity='.5';
+}
 var builtComp2=false;
-function buildComp(){if(builtComp2)return;builtComp2=true;var el=document.getElementById("comprehension");if(!el)return;el.innerHTML=COMP_QUESTIONS.map(function(q,qi){return "<div style="background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;"><div style="font-size:1rem;color:var(--text);font-weight:600;margin-bottom:8px;">"+( qi+1)+"、"+q.q+"</div>"+q.opts.map(function(o,oi){return "<label style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;margin-bottom:4px;background:var(--stroke-area-bg);"><input type="radio" name="comp"+qi+"" value=""+oi+""> <span style="font-size:0.92rem;color:var(--text);">"+o+"</span></label>";}).join("")+"</div>";}).join("");}
-function checkComp(){if(!builtComp2)buildComp();var ok=0;COMP_QUESTIONS.forEach(function(q,qi){var sel=document.querySelector("input[name=comp"+qi+"]:checked");document.querySelectorAll("input[name=comp"+qi+"]").forEach(function(inp,oi){inp.parentElement.style.background=oi===q.answer?"rgba(67,160,71,0.12)":sel&&oi===+sel.value?"rgba(229,57,53,0.1)":"var(--stroke-area-bg)";});if(sel&&+sel.value===q.answer)ok++;});document.getElementById("compResult").innerHTML=ok===COMP_QUESTIONS.length?"<span style="color:#43a047;font-weight:700">🎉 全对！优秀！</span>":"<span style="color:#e53935;">答对 "+ok+"/"+COMP_QUESTIONS.length+" 题，绿色是正确答案。</span>";if(ok===COMP_QUESTIONS.length)confetti(40);}
-function resetComp(){document.querySelectorAll("#tab-reading input[type=radio]").forEach(function(i){i.checked=false;i.parentElement.style.background="var(--stroke-area-bg)";});document.getElementById("compResult").innerHTML="";}
+function buildComp(){
+  if(builtComp2)return;builtComp2=true;
+  var el=document.getElementById('comprehension');if(!el)return;
+  el.innerHTML=COMP_QUESTIONS.map(function(q,qi){
+    return '<div style="background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;">'
+      +'<div style="font-size:1rem;color:var(--text);font-weight:600;margin-bottom:8px;">'+(qi+1)+'、'+q.q+'</div>'
+      +q.opts.map(function(o,oi){
+        return '<label style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;margin-bottom:4px;background:var(--stroke-area-bg);">'
+          +'<input type="radio" name="comp'+qi+'" value="'+oi+'"> '
+          +'<span style="font-size:0.92rem;color:var(--text);">'+o+'</span></label>';
+      }).join('')+'</div>';
+  }).join('');
+}
+function checkComp(){
+  if(!builtComp2)buildComp();
+  var ok=0;
+  COMP_QUESTIONS.forEach(function(q,qi){
+    var sel=document.querySelector('input[name="comp'+qi+'"]:checked');
+    document.querySelectorAll('input[name="comp'+qi+'"]').forEach(function(inp,oi){
+      inp.parentElement.style.background=oi===q.answer?'rgba(67,160,71,0.12)':sel&&oi===+sel.value?'rgba(229,57,53,0.1)':'var(--stroke-area-bg)';
+    });
+    if(sel&&+sel.value===q.answer)ok++;
+  });
+  document.getElementById('compResult').innerHTML=ok===COMP_QUESTIONS.length
+    ?'<span style="color:#43a047;font-weight:700">🎉 全对！优秀！</span>'
+    :'<span style="color:#e53935;">答对 '+ok+'/'+COMP_QUESTIONS.length+' 题，绿色是正确答案。</span>';
+  if(ok===COMP_QUESTIONS.length)launchConfetti();
+}
+function resetComp(){
+  document.querySelectorAll('#tab-reading input[type=radio]').forEach(function(i){i.checked=false;i.parentElement.style.background='var(--stroke-area-bg)';});
+  document.getElementById('compResult').innerHTML='';
+}
+
 
 </script>
 </body>

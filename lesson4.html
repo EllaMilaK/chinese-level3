@@ -90,7 +90,8 @@ header h1 span{font-size:0.9rem;color:rgba(255,255,255,0.8);display:block;margin
 .char-pinyin{font-size:0.82rem;color:var(--accent2);margin-bottom:2px;}
 .char-meaning{font-size:0.72rem;color:var(--text2);}
 .char-stroke-badge{position:absolute;top:7px;right:7px;background:var(--badge-bg);color:var(--accent);font-size:0.62rem;padding:1px 5px;border-radius:8px;}
-.char-speak-btn{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);background:var(--speak-btn-bg);border:1px solid var(--border2);color:var(--accent2);border-radius:10px;padding:2px 8px;font-size:0.68rem;cursor:pointer;}
+.char-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:3px;}
+.char-speak-btn{background:var(--speak-btn-bg);border:1px solid var(--border2);color:var(--accent2);border-radius:8px;padding:2px 7px;font-size:0.68rem;cursor:pointer;flex-shrink:0;}
 .char-speak-btn:hover{background:var(--speak-btn-hover);}
 .tzg-wrap{position:relative;display:inline-block;border-radius:10px;}
 .tzg-wrap svg.tzg-overlay{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:8;}
@@ -351,7 +352,6 @@ header h1 span{font-size:0.9rem;color:rgba(255,255,255,0.8);display:block;margin
           <div id="quiz-div" style="width:180px;height:180px;"></div>
         </div>
         <div class="stroke-btns">
-          <button class="btn btn-primary btn-sm" onclick="startQuizMode()">📝 开始练习</button>
           <button class="btn btn-secondary btn-sm" onclick="quizW&&quizW.showCharacter()">👁 提示</button>
           <button class="btn btn-secondary btn-sm" onclick="quizW&&quizW.cancelQuiz()">↺ 重来</button>
         </div>
@@ -901,11 +901,14 @@ speechSynthesis.onvoiceschanged=loadVoice; loadVoice();
 function speak(text,onEnd){
   if(!text) return;
   speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(text);
-  u.lang='zh-CN'; u.rate=0.82; u.pitch=1.05;
-  if(zhVoice) u.voice=zhVoice;
-  if(onEnd) u.onend=onEnd;
-  speechSynthesis.speak(u);
+  setTimeout(()=>{
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang='zh-CN'; u.rate=0.82; u.pitch=1.05;
+    if(zhVoice) u.voice=zhVoice;
+    if(onEnd) u.onend=onEnd;
+    u.onerror=()=>{if(onEnd)onEnd();};
+    speechSynthesis.speak(u);
+  },80);
 }
 
 // ═══════════════════════════════════════════════
@@ -957,7 +960,12 @@ function togglePinyin(){
 }
 
 function storyPlay(){
-  if(storyPaused){storyPaused=false;storyNextPara();return;}
+  if(storyPaused){
+    storyPaused=false;
+    document.getElementById('storyPauseBtn').textContent='⏸ 暂停';
+    setTimeout(()=>{if(storyPlaying&&!storyPaused)storyNextPara();},200);
+    return;
+  }
   storyIdx=0;storyPlaying=true;storyPaused=false;
   document.getElementById('storyPlayBtn').disabled=true;
   document.getElementById('storyPauseBtn').disabled=false;
@@ -978,6 +986,13 @@ function highlightStoryPara(idx){
   });
 }
 function storyPause(){
+  if(storyPaused){
+    // Already paused - treat as resume
+    storyPaused=false;
+    document.getElementById('storyPauseBtn').textContent='⏸ 暂停';
+    setTimeout(()=>{if(storyPlaying&&!storyPaused)storyNextPara();},200);
+    return;
+  }
   storyPaused=true;speechSynthesis.cancel();
   document.getElementById('storyPauseBtn').disabled=true;
   document.getElementById('storyPauseBtn').style.opacity='.5';
@@ -1005,9 +1020,8 @@ function buildCharGrid(){
       ${poly}
       <div class="char-stroke-badge">${c.strokes}画</div>
       <div class="char-big">${c.char}</div>
-      <div class="char-pinyin">${c.pinyin}</div>
+      <div class="char-row"><span class="char-pinyin">${c.pinyin}</span><button class="char-speak-btn" onclick="event.stopPropagation();speak(c.char)">🔊</button></div>
       <div class="char-meaning">${c.meaning}</div>
-      <button class="char-speak-btn" onclick="event.stopPropagation();speak('${c.char}')">🔊</button>
     </div>`;
   }).join('');
   selectChar(0);
@@ -1050,6 +1064,7 @@ function initHanziWriters(char){
   document.getElementById('quiz-div').innerHTML='';
   demoW=HanziWriter.create('demo-div',char,{width:176,height:176,padding:8,showOutline:true,strokeColor:'#e65100',outlineColor:'#ffccbc',drawingColor:'#e65100',showCharacter:true});
   quizW=HanziWriter.create('quiz-div',char,{width:176,height:176,padding:8,showOutline:true,strokeColor:'#e65100',outlineColor:'#ffccbc',drawingColor:'#e65100',showCharacter:false,showHintAfterMisses:2,markStrokeCorrectAfterMisses:3});
+  setTimeout(startQuizMode,700);
   setTimeout(()=>{addTZGOverlay('demoWrap');addTZGOverlay('quizWrap');},200);
 }
 
@@ -1091,25 +1106,25 @@ function speakCurrentChar(){speak(CHARS[curCharIdx].char);}
 function renderRadicalSection(char){
   const data=RADICAL_DATA[char];
   const el=document.getElementById('radicalContent');
-  if(!data){el.innerHTML='<p style="font-size:0.85rem;color:var(--text2)">暂无词根信息</p>';return;}
-  let html=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:0.85rem;margin-bottom:12px;">
-    <div><p style="color:var(--text);line-height:1.7">${data.intro}</p>${data.oracle?`<p style="color:var(--text2);margin-top:6px;font-style:italic;">${data.oracle}</p>`:''}</div>
-    <div style="border-left:2px solid var(--border2);padding-left:12px;">
-      <p style="color:var(--text2);line-height:1.7">${data.introEn}</p>${data.oracleEn?`<p style="color:var(--text3);margin-top:6px;font-style:italic;">${data.oracleEn}</p>`:''}</div>
-  </div>`;
-  if(data.groups){
-    data.groups.forEach(g=>{
-      html+=`<div class="radical-group"><div class="radical-label">${g.radical}</div><div class="radical-chars">`;
-      g.chars.forEach(rc=>{
-        html+=`<div class="radical-char-item" onclick="speak('${rc.char}')">
-          <span class="rci-char">${rc.char}</span>
-          <span class="rci-py">${rc.py}</span>
-          <span class="rci-word">${rc.word}</span>
-        </div>`;
-      });
-      html+='</div></div>';
-    });
+  if(!data){el.innerHTML='<p style="font-size:0.85rem;color:var(--text2);padding:8px;">点击上面的生字查看词根</p>';return;}
+  let html='';
+  html+=`<div style="font-size:0.9rem;font-weight:700;color:var(--accent2);margin-bottom:4px;">🧩 ${data.intro}</div>`;
+  html+=`<div style="font-size:0.78rem;color:var(--text2);margin-bottom:10px;font-style:italic;">${data.introEn}</div>`;
+  if(data.oracle){
+    html+=`<div style="background:rgba(255,160,0,0.08);border-left:3px solid #ff9900;border-radius:0 8px 8px 0;padding:10px 12px;margin-bottom:12px;">
+      <div style="font-size:0.75rem;font-weight:700;color:#ff9900;margin-bottom:4px;">🪬 甲骨文渊源 / Oracle Bone Origin:</div>
+      <div style="font-size:0.82rem;color:var(--text);line-height:1.7;">${data.oracle}</div>
+      <div style="font-size:0.78rem;color:var(--text2);margin-top:5px;font-style:italic;line-height:1.6;">${data.oracleEn}</div>
+    </div>`;
   }
+  data.groups.forEach(g=>{
+    html+=`<div class="radical-group"><div class="radical-label">🌿 ${g.radical}</div><div class="radical-chars">`;
+    g.chars.forEach(rc=>{
+      const sw=rc.word.replace(/[（(][^）)]*[）)]/g,'').trim()||rc.char;
+      html+=`<div class="radical-char-item" onclick="speak('${sw}')"><span class="rci-char">${rc.char}</span><span class="rci-py">${rc.py}</span><span class="rci-word">${rc.word}</span></div>`;
+    });
+    html+='</div></div>';
+  });
   el.innerHTML=html;
 }
 

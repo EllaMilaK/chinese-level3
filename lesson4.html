@@ -353,7 +353,7 @@ header h1 span{font-size:0.9rem;color:rgba(255,255,255,0.8);display:block;margin
         </div>
         <div class="stroke-btns">
           <button class="btn btn-secondary btn-sm" onclick="quizW&&quizW.showCharacter()">👁 提示</button>
-          <button class="btn btn-secondary btn-sm" onclick="quizW&&quizW.cancelQuiz()">↺ 重来</button>
+          <button class="btn btn-secondary btn-sm" onclick="startQuizMode()">↺ 重来</button>
         </div>
         <div class="stroke-msg" id="strokeMsg"></div>
       </div>
@@ -1091,11 +1091,18 @@ function startQuizMode(){
   if(!quizW) return;
   document.getElementById('strokeMsg').textContent='';
   quizW.quiz({
-    onMistake:(si)=>{document.getElementById('strokeMsg').textContent=`第${si.strokeNum+1}笔：再试一次！`;},
+    onMistake:(si)=>{
+      const names=STROKE_NAMES[CHARS[curCharIdx].char]||[];
+      const name=names[si.strokeNum]||`第${si.strokeNum+1}笔`;
+      document.getElementById('strokeMsg').textContent=`${name}：再试一次！`;
+      document.getElementById('strokeMsg').style.color='#e53935';
+    },
     onCorrectStroke:(si)=>{
       const names=STROKE_NAMES[CHARS[curCharIdx].char]||[];
-      const name=names[si.strokeNum]||'';
-      document.getElementById('strokeMsg').textContent=`✓ ${name} 正确！`;
+      const name=names[si.strokeNum]||`第${si.strokeNum+1}笔`;
+      document.getElementById('strokeMsg').textContent=`✓ ${name}`;
+      document.getElementById('strokeMsg').style.color='#2e7d32';
+      if(document.getElementById('strokeAudioChk').checked) speak(name);
     },
     onComplete:()=>{document.getElementById('strokeMsg').textContent='🎉 写完了！很棒！';launchConfetti();}
   });
@@ -1627,10 +1634,8 @@ function launchConfetti(){
 // ═══════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded',()=>{
-  buildStory();
-  initFlashcards();
-});
+buildStory();
+
 </script>
 </body>
 </html>

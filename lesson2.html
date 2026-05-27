@@ -91,7 +91,8 @@ header h1 span{font-size:0.9rem;color:rgba(255,255,255,0.8);display:block;margin
 .char-pinyin{font-size:0.82rem;color:var(--accent2);margin-bottom:2px;}
 .char-meaning{font-size:0.72rem;color:var(--text2);}
 .char-stroke-badge{position:absolute;top:7px;right:7px;background:var(--badge-bg);color:var(--accent);font-size:0.62rem;padding:1px 5px;border-radius:8px;}
-.char-speak-btn{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);background:var(--speak-btn-bg);border:1px solid var(--border2);color:var(--accent2);border-radius:10px;padding:2px 8px;font-size:0.68rem;cursor:pointer;}
+.char-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:3px;}
+.char-speak-btn{background:var(--speak-btn-bg);border:1px solid var(--border2);color:var(--accent2);border-radius:8px;padding:2px 7px;font-size:0.68rem;cursor:pointer;flex-shrink:0;}
 .char-speak-btn:hover{background:var(--speak-btn-hover);}
 .tzg-wrap{position:relative;display:inline-block;border-radius:10px;}
 .tzg-wrap svg.tzg-overlay{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:8;}
@@ -341,9 +342,8 @@ header h1 span{font-size:0.9rem;color:rgba(255,255,255,0.8);display:block;margin
           <div id="quiz-div" style="width:180px;height:180px;"></div>
         </div>
         <div class="stroke-btns">
-          <button class="btn btn-primary btn-sm" onclick="startQuizMode()">📝 开始练习</button>
           <button class="btn btn-secondary btn-sm" onclick="quizW&&quizW.showCharacter()">👁 提示</button>
-          <button class="btn btn-secondary btn-sm" onclick="quizW&&quizW.cancelQuiz()">↺ 重来</button>
+          <button class="btn btn-secondary btn-sm" onclick="startQuizMode()">↺ 重来</button>
         </div>
         <div class="stroke-msg" id="strokeMsg"></div>
       </div>
@@ -697,8 +697,19 @@ let synth=window.speechSynthesis,zhVoice=null;
 function loadVoice(){const voices=synth.getVoices();zhVoice=voices.find(v=>v.lang==='zh-CN')||voices.find(v=>v.lang.startsWith('zh'))||null;}
 loadVoice();
 if(speechSynthesis.onvoiceschanged!==undefined) speechSynthesis.onvoiceschanged=loadVoice;
-function speak(txt,rate=0.85,pitch=1){synth.cancel();const u=new SpeechSynthesisUtterance(txt);u.lang='zh-CN';u.rate=rate;u.pitch=pitch;if(zhVoice)u.voice=zhVoice;synth.speak(u);return u;}
-function speakAndWait(txt,rate=0.85,pitch=1){return new Promise(res=>{synth.cancel();const u=new SpeechSynthesisUtterance(txt);u.lang='zh-CN';u.rate=rate;u.pitch=pitch;if(zhVoice)u.voice=zhVoice;u.onend=res;synth.speak(u);});}
+function speak(txt,rate=0.85,pitch=1){synth.cancel();setTimeout(()=>{const u=new SpeechSynthesisUtterance(txt);u.lang='zh-CN';u.rate=rate;u.pitch=pitch;if(zhVoice)u.voice=zhVoice;synth.speak(u);},80);}
+function speakAndWait(txt,rate=0.85,pitch=1){
+  return new Promise(res=>{
+    synth.cancel();
+    setTimeout(()=>{
+      const u=new SpeechSynthesisUtterance(txt);
+      u.lang='zh-CN';u.rate=rate;u.pitch=pitch;
+      if(zhVoice)u.voice=zhVoice;
+      u.onend=res;u.onerror=res;
+      synth.speak(u);
+    },80);
+  });
+}
 
 
 // ── 句型数据 (Lesson 2) ─────────────────────────────────────────────────
@@ -779,13 +790,18 @@ function buildStory(){
     el.appendChild(div);
   });
 }
-async function storyPlay(){
-  if(storyPlaying)return;storyPlaying=true;storyStopped=false;
+let storyPauseIdx=0,storyIsPaused=false;
+async function storyPlay(startIdx){
+  if(storyPlaying)return;
+  if(startIdx===undefined)startIdx=0;
+  storyPlaying=true;storyStopped=false;storyIsPaused=false;
   document.getElementById('storyPlayBtn').disabled=true;
   document.getElementById('storyPauseBtn').disabled=false;document.getElementById('storyPauseBtn').style.opacity='1';
+  document.getElementById('storyPauseBtn').textContent='⏸ 暂停';
   document.getElementById('storyStopBtn').disabled=false;document.getElementById('storyStopBtn').style.opacity='1';
-  for(let i=0;i<STORY.length;i++){
-    if(storyStopped)break;
+  for(let i=startIdx;i<STORY.length;i++){
+    storyPauseIdx=i;
+    if(storyStopped||!storyPlaying)break;
     document.querySelectorAll('.story-para').forEach(p=>p.querySelectorAll('.pb').forEach(s=>s.classList.remove('hl')));
     const paras=document.querySelectorAll('.story-para');
     if(paras[i])paras[i].querySelectorAll('.pb').forEach(s=>s.classList.add('hl'));
@@ -795,12 +811,25 @@ async function storyPlay(){
   }
   document.querySelectorAll('.pb').forEach(s=>s.classList.remove('hl'));
   storyPlaying=false;
-  document.getElementById('storyPlayBtn').disabled=false;
-  document.getElementById('storyPauseBtn').disabled=true;document.getElementById('storyPauseBtn').style.opacity='.5';
-  document.getElementById('storyStopBtn').disabled=true;document.getElementById('storyStopBtn').style.opacity='.5';
+  if(!storyIsPaused){
+    storyPauseIdx=0;
+    document.getElementById('storyPlayBtn').disabled=false;
+    document.getElementById('storyPauseBtn').disabled=true;document.getElementById('storyPauseBtn').style.opacity='.5';
+    document.getElementById('storyPauseBtn').textContent='⏸ 暂停';
+    document.getElementById('storyStopBtn').disabled=true;document.getElementById('storyStopBtn').style.opacity='.5';
+  }
 }
 function togglePinyin(){showPY=!showPY;document.querySelectorAll('.pb .py').forEach(el=>el.style.visibility=showPY?'visible':'hidden');}
-function storyPause(){synth.cancel();storyPlaying=false;}
+function storyPause(){
+  if(storyIsPaused){
+    storyIsPaused=false;
+    document.getElementById('storyPauseBtn').textContent='⏸ 暂停';
+    setTimeout(()=>storyPlay(storyPauseIdx),200);
+  }else{
+    storyIsPaused=true;storyPlaying=false;synth.cancel();
+    document.getElementById('storyPauseBtn').textContent='▶ 继续';
+  }
+}
 function storyStop(){storyStopped=true;synth.cancel();storyPlaying=false;
   document.querySelectorAll('.pb').forEach(s=>s.classList.remove('hl'));
   document.getElementById('storyPlayBtn').disabled=false;
@@ -827,9 +856,8 @@ function buildCharGrid(){
     const card=document.createElement('div');card.className='char-card'+(i===0?' active':'');
     card.innerHTML=`<div class="char-stroke-badge">${c.strokes}画</div>
       <div class="char-big">${c.char}</div>
-      <div class="char-pinyin">${c.pinyin}</div>
-      <div class="char-meaning">${c.meaning}</div>
-      <button class="char-speak-btn" onclick="event.stopPropagation();speak('${c.char}',0.9)">🔊</button>`;
+      <div class="char-row"><span class="char-pinyin">${c.pinyin}</span><button class="char-speak-btn" onclick="event.stopPropagation();speak(c.char)">🔊</button></div>
+      <div class="char-meaning">${c.meaning}</div>`;
     card.onclick=()=>selectChar(i);
     grid.appendChild(card);
   });
@@ -853,16 +881,9 @@ function initHanziWriter(idx){
   document.getElementById('strokeNameDisp').textContent='';
   const names=STROKE_NAMES[c.char]||[];
   demoW=HanziWriter.create('demo-div',c.char,{width:180,height:180,padding:8,strokeColor:'#0277bd',strokeAnimationSpeed:0.9,delayBetweenStrokes:300,showCharacter:true,showOutline:true,outlineColor:'#b3d9f0'});
-  quizW=HanziWriter.create('quiz-div',c.char,{width:180,height:180,padding:8,strokeColor:'#0277bd',drawingColor:'#e65100',showCharacter:false,showOutline:true,outlineColor:'#b3d9f0',
-    onCorrectStroke:(i)=>{
-      const n=names[i]||'';
-      document.getElementById('strokeMsg').textContent=`✓ ${n?n+' ':''}正确！`;
-      if(document.getElementById('strokeAudioChk').checked&&n) speak(n,1);
-    },
-    onMistake:()=>{document.getElementById('strokeMsg').textContent='再试一次！';},
-    onComplete:()=>{document.getElementById('strokeMsg').textContent='🎉 全部正确！';launchConfetti();}
-  });
+  quizW=HanziWriter.create('quiz-div',c.char,{width:180,height:180,padding:8,strokeColor:'#0277bd',drawingColor:'#e65100',showCharacter:false,showOutline:true,outlineColor:'#b3d9f0'});
   addTZGOverlay('demoWrap');addTZGOverlay('quizWrap');
+  setTimeout(startQuizMode,700);
 }
 function animateChar(){
   if(!demoW)return;
@@ -876,23 +897,49 @@ function animateChar(){
     onComplete:()=>{document.getElementById('strokeNameDisp').textContent='✓ 完成！';}
   });
 }
-function startQuizMode(){if(quizW){document.getElementById('strokeMsg').textContent='';quizW.quiz();}}
+function startQuizMode(){
+  if(!quizW) return;
+  const c=CHARS[curCharIdx];
+  const names=STROKE_NAMES[c.char]||[];
+  document.getElementById('strokeMsg').textContent='';
+  quizW.quiz({
+    onMistake:(strokeData)=>{
+      const n=names[strokeData.strokeNum]||`第${strokeData.strokeNum+1}笔`;
+      document.getElementById('strokeMsg').textContent=`${n}：再试一次！`;
+      document.getElementById('strokeMsg').style.color='#e53935';
+    },
+    onCorrectStroke:(strokeData)=>{
+      const n=names[strokeData.strokeNum]||`第${strokeData.strokeNum+1}笔`;
+      document.getElementById('strokeMsg').textContent=`✓ ${n}`;
+      document.getElementById('strokeMsg').style.color='#2e7d32';
+      if(document.getElementById('strokeAudioChk').checked) speak(n);
+    },
+    onComplete:()=>{
+      document.getElementById('strokeMsg').textContent='🎉 写完了！太棒了！';
+      launchConfetti();
+    }
+  });
+}
 function speakCurrentChar(){speak(CHARS[curCharIdx].char);}
 function renderRadicalSection(char){
   const data=RADICAL_DATA[char];
   const el=document.getElementById('radicalContent');
-  if(!data){el.innerHTML='<p style="font-size:0.85rem;color:var(--text2)">暂无词根数据</p>';return;}
-  let html=`<p style="font-size:0.88rem;color:var(--text);margin-bottom:6px"><strong style="color:var(--accent2)">${data.intro}</strong></p>
-    <p style="font-size:0.82rem;color:var(--text2);margin-bottom:10px;font-style:italic">${data.introEn}</p>
-    <p style="font-size:0.82rem;color:var(--text2);margin-bottom:6px">${data.oracle}</p>
-    <p style="font-size:0.78rem;color:var(--text3);margin-bottom:12px;font-style:italic">${data.oracleEn}</p>`;
+  if(!data){el.innerHTML='<p style="font-size:0.85rem;color:var(--text2);padding:8px;">点击上面的生字查看词根</p>';return;}
+  let html='';
+  html+=`<div style="font-size:0.9rem;font-weight:700;color:var(--accent2);margin-bottom:4px;">🧩 ${data.intro}</div>`;
+  html+=`<div style="font-size:0.78rem;color:var(--text2);margin-bottom:10px;font-style:italic;">${data.introEn}</div>`;
+  if(data.oracle){
+    html+=`<div style="background:rgba(255,160,0,0.08);border-left:3px solid #ff9900;border-radius:0 8px 8px 0;padding:10px 12px;margin-bottom:12px;">
+      <div style="font-size:0.75rem;font-weight:700;color:#ff9900;margin-bottom:4px;">🪬 甲骨文渊源 / Oracle Bone Origin:</div>
+      <div style="font-size:0.82rem;color:var(--text);line-height:1.7;">${data.oracle}</div>
+      <div style="font-size:0.78rem;color:var(--text2);margin-top:5px;font-style:italic;line-height:1.6;">${data.oracleEn}</div>
+    </div>`;
+  }
   data.groups.forEach(g=>{
     html+=`<div class="radical-group"><div class="radical-label">🌿 ${g.radical}</div><div class="radical-chars">`;
     g.chars.forEach(rc=>{
-      html+=`<div class="radical-char-item" onclick="speak('${rc.char}',0.9)">
-        <span class="rci-char">${rc.char}</span>
-        <span class="rci-py">${rc.py}</span>
-        <span class="rci-word">${rc.word}</span></div>`;
+      const sw=rc.word.replace(/[（(][^）)]*[）)]/g,'').trim()||rc.char;
+      html+=`<div class="radical-char-item" onclick="speak('${sw}')"><span class="rci-char">${rc.char}</span><span class="rci-py">${rc.py}</span><span class="rci-word">${rc.word}</span></div>`;
     });
     html+='</div></div>';
   });
@@ -1363,7 +1410,7 @@ function checkComp(){
   COMP_QUESTIONS.forEach(function(q,qi){
     var sel=document.querySelector('input[name="comp'+qi+'"]:checked');
     document.querySelectorAll('input[name="comp'+qi+'"]').forEach(function(inp,oi){
-      inp.parentElement.style.background=oi===q.answer?'rgba(67,160,71,0.12)':sel&&oi===+sel.value?'rgba(229,57,53,0.1)':'var(--stroke-area-bg)';
+      inp.parentElement.style.background=oi===q.answer?'rgba(67,160,71,0.12)':sel&&oi===+sel.value?'rgba(229,57,53,0.1)':'';
     });
     if(sel&&+sel.value===q.answer)ok++;
   });
@@ -1373,10 +1420,11 @@ function checkComp(){
   if(ok===COMP_QUESTIONS.length)launchConfetti();
 }
 function resetComp(){
-  document.querySelectorAll('#tab-reading input[type=radio]').forEach(function(i){i.checked=false;i.parentElement.style.background='var(--stroke-area-bg)';});
+  document.querySelectorAll('#tab-reading input[type=radio]').forEach(function(i){i.checked=false;i.parentElement.style.background='';});
   document.getElementById('compResult').innerHTML='';
 }
 
+buildStory();
 
 </script>
 </body>

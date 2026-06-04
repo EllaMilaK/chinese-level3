@@ -78,7 +78,7 @@ header h1 span{font-size:0.9rem;color:rgba(255,255,255,0.8);display:block;margin
 .story-text{line-height:2.8;}
 .story-para{margin-bottom:18px;}
 .pb{display:inline-flex;flex-direction:column;align-items:center;margin:0 1px;vertical-align:bottom;cursor:pointer;}
-.pb .py{font-size:0.82rem;color:var(--pinyin-color);line-height:1.4;min-height:1em;}
+.pb .py{font-size:1.0rem;color:var(--pinyin-color);line-height:1.4;min-height:1em;}
 .pb .ch{font-size:1.2rem;transition:color .15s;color:var(--text);}
 .pb:hover .ch{color:var(--accent);}
 .pb.hl .ch{color:var(--story-hl-text);background:var(--story-hl-bg);border-radius:3px;}
@@ -90,7 +90,7 @@ header h1 span{font-size:0.9rem;color:rgba(255,255,255,0.8);display:block;margin
 .char-card.done{border-color:#43a047;}
 .char-done-badge{position:absolute;top:5px;left:7px;background:#43a047;color:#fff;font-size:0.62rem;font-weight:700;padding:1px 6px;border-radius:8px;line-height:1.5;}
 .char-big{font-size:2.8rem;line-height:1.1;margin-bottom:4px;color:var(--text);}
-.char-pinyin{font-size:0.82rem;color:var(--accent2);margin-bottom:2px;}
+.char-pinyin{font-size:0.96rem;color:var(--accent2);margin-bottom:2px;}
 .char-meaning{font-size:0.72rem;color:var(--text2);}
 .char-stroke-badge{position:absolute;top:7px;right:7px;background:var(--badge-bg);color:var(--accent);font-size:0.62rem;padding:1px 5px;border-radius:8px;}
 .char-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:3px;}
@@ -118,7 +118,7 @@ header h1 span{font-size:0.9rem;color:rgba(255,255,255,0.8);display:block;margin
 .radical-char-item{background:var(--radical-item-bg);border:1px solid var(--border);border-radius:8px;padding:7px 10px;cursor:pointer;transition:all .2s;min-width:80px;}
 .radical-char-item:hover{border-color:var(--accent2);background:var(--radical-item-hover);}
 .rci-char{font-size:1.5rem;color:var(--accent);display:block;text-align:center;}
-.rci-py{font-size:0.68rem;color:var(--accent2);display:block;text-align:center;}
+.rci-py{font-size:0.82rem;color:var(--accent2);display:block;text-align:center;}
 .rci-word{font-size:0.7rem;color:var(--text2);display:block;text-align:center;margin-top:1px;}
 .vocab-modes{display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap;}
 .mode-btn{padding:7px 14px;border-radius:18px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;font-size:0.84rem;transition:all .2s;}
@@ -162,7 +162,7 @@ header h1 span{font-size:0.9rem;color:rgba(255,255,255,0.8);display:block;margin
 .bubble .spk-name{font-size:0.7rem;color:var(--spk1-color);margin-bottom:3px;font-weight:700;}
 .spk2 .bubble .spk-name{color:var(--spk2-color);}
 .bubble .line-txt{font-size:1rem;line-height:1.5;color:var(--text);}
-.bubble .line-py{font-size:0.7rem;color:var(--text2);margin-top:3px;}
+.bubble .line-py{font-size:0.84rem;color:var(--text2);margin-top:3px;}
 .rec-box{background:var(--rec-box-bg);border:1px solid var(--border2);border-radius:12px;padding:14px;margin-top:14px;}
 .rec-box h4{color:var(--accent);margin-bottom:8px;font-size:0.95rem;}
 .rec-target{font-size:1.1rem;margin:8px 0;color:var(--accent2);}
@@ -1012,8 +1012,26 @@ const R_EMOJIS = ['🐝','🌸','🍯','🌼','🐝'];
 // ═══════════════════════════════════════════════
 let zhVoice=null;
 function loadVoice(){
-  const vs=speechSynthesis.getVoices();
-  zhVoice=vs.find(v=>v.lang==='zh-CN')||vs.find(v=>v.lang.startsWith('zh'))||null;
+  const voices=(speechSynthesis).getVoices();
+  // Priority: best mainland Mandarin voices by platform
+  const PREF=[
+    'Google 普通话（中国大陆）',   // Android Chrome
+    'Microsoft Xiaoxiao',            // Windows Neural (best)
+    'Microsoft Xiaoyi',              // Windows Neural
+    'Microsoft Yunxi',               // Windows Neural male
+    'Microsoft Huihui',              // Windows older
+    'Tingting','Ting-Ting',          // macOS / iOS
+    'Meijia',                        // macOS traditional
+  ];
+  for(const name of PREF){
+    const v=voices.find(v=>v.name.includes(name));
+    if(v){zhVoice=v;return;}
+  }
+  // Fallback: any zh-CN, then any zh
+  zhVoice=voices.find(v=>v.lang==='zh-CN')
+        ||voices.find(v=>v.lang==='zh_CN')
+        ||voices.find(v=>v.lang.startsWith('zh'))
+        ||null;
 }
 speechSynthesis.onvoiceschanged=loadVoice; loadVoice();
 

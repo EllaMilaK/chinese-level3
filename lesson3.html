@@ -1509,8 +1509,32 @@ function buildComp(){
   const el=document.getElementById('comprehension');
   if(!el)return;
   el.innerHTML=COMP_QUESTIONS.map((q,qi)=>
-    '<div style="background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;">' +
+    '<div style="background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;">'+
     '<div style="font-size:1rem;color:var(--text);font-weight:600;margin-bottom:8px;">'+(qi+1)+'、'+q.q+'</div>'+
     q.opts.map((o,oi)=>
       '<label style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;margin-bottom:4px;background:var(--stroke-area-bg);">'+
-      '<input type="radio" name="comp
+      '<input type="radio" name="comp'+qi+'" value="'+oi+'"> '+o+'</label>'
+    ).join('')+
+    '</div>'
+  ).join('');
+}
+function checkComp(){
+  let correct=0;
+  COMP_QUESTIONS.forEach((q,qi)=>{
+    const sel=document.querySelector('input[name="comp'+qi+'"]:checked');
+    if(sel&&+sel.value===q.answer)correct++;
+  });
+  document.getElementById('compScore').textContent='得分：'+correct+' / '+COMP_QUESTIONS.length;
+  if(correct===COMP_QUESTIONS.length)launchConfetti();
+}
+function resetComp(){
+  builtComp=false;
+  const el=document.getElementById('comprehension');
+  if(el)el.innerHTML='';
+  buildComp();
+  const sc=document.getElementById('compScore');if(sc)sc.textContent='';
+}
+
+</script>
+</body>
+</html>

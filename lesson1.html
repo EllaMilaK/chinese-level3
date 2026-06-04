@@ -1627,4 +1627,43 @@ function readPause(){
 }
 function readStop(){speechSynthesis.cancel();resetReadBtns2();}
 function resetReadBtns2(){
-  document.getElementById('readPlayBtn').disabled=false;document.getElementB
+  document.getElementById('readPlayBtn').disabled=false;document.getElementById('readPlayBtn').style.opacity='1';
+  document.getElementById('readPauseBtn').disabled=true;document.getElementById('readPauseBtn').style.opacity='.5';document.getElementById('readPauseBtn').textContent='⏸ 暂停';
+  document.getElementById('readStopBtn').disabled=true;document.getElementById('readStopBtn').style.opacity='.5';
+  readPlaying2=false;readPaused2=false;
+}
+function buildComp(){
+  var el=document.getElementById('comprehension');
+  if(!el||el.dataset.built)return;
+  el.innerHTML=COMP_QUESTIONS.map(function(q,qi){
+    var opts=q.opts.map(function(o,oi){
+      return '<div class="mcq-opt" onclick="pickComp('+qi+','+oi+','+q.answer+',this)">'+o+'</div>';
+    }).join('');
+    return '<div style="margin-bottom:12px;"><div style="font-size:0.95rem;font-weight:700;color:var(--text);margin-bottom:8px;">'+(qi+1)+'、'+q.q+'</div><div class="mcq-opts mcq-opts-v" id="comp'+qi+'">'+opts+'</div><div class="fill-fb" id="compFb'+qi+'"></div></div>';
+  }).join('');
+  el.dataset.built='1';
+}
+function pickComp(qi,oi,correct,btn){
+  var c=btn.closest('.mcq-opts');
+  c.querySelectorAll('.mcq-opt').forEach(function(b){b.disabled=true;});
+  if(oi===correct){
+    btn.classList.add('correct');
+    document.getElementById('compFb'+qi).innerHTML='<span style="color:#43a047">✓ 正确！</span>';
+    launchConfetti();
+  } else {
+    btn.classList.add('wrong');
+    c.querySelectorAll('.mcq-opt').forEach(function(b,i){if(i===correct)b.classList.add('correct');});
+    document.getElementById('compFb'+qi).innerHTML='<span style="color:#e53935">✗ 答案是选项'+(correct+1)+'</span>';
+  }
+}
+function checkComp(){/* handled by pickComp per-question */}
+function resetComp(){
+  var el=document.getElementById('comprehension');
+  if(el){el.removeAttribute('data-built');el.innerHTML='';}
+  buildComp();
+  document.getElementById('compResult').textContent='';
+}
+
+</script>
+</body>
+</html>

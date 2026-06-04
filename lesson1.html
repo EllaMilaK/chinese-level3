@@ -80,7 +80,7 @@ header h1 span{font-size:0.9rem;color:rgba(255,255,255,0.8);display:block;margin
 .story-text{line-height:2.8;}
 .story-para{margin-bottom:18px;}
 .pb{display:inline-flex;flex-direction:column;align-items:center;margin:0 1px;vertical-align:bottom;cursor:pointer;}
-.pb .py{font-size:0.68rem;color:var(--pinyin-color);line-height:1.4;min-height:1em;}
+.pb .py{font-size:0.82rem;color:var(--pinyin-color);line-height:1.4;min-height:1em;}
 .pb .ch{font-size:1.2rem;transition:color .15s;color:var(--text);}
 .pb:hover .ch{color:var(--accent);}
 .pb.hl .ch{color:var(--story-hl-text);background:var(--story-hl-bg);border-radius:3px;}
@@ -898,46 +898,62 @@ function togglePinyin(){
   });
 }
 let storyPauseIdx=0,storyIsPaused=false;
-async function storyPlay(startIdx){
-  if(storyPlaying)return;
+function storyPlay(startIdx){
+  if(storyPlaying&&!storyIsPaused)return;
+  if(storyIsPaused){
+    storyIsPaused=false;
+    document.getElementById('storyPauseBtn').textContent='⏸ 暂停';
+    storyPlayLine(storyPauseIdx);
+    return;
+  }
   if(startIdx===undefined)startIdx=0;
   storyPlaying=true;storyStopped=false;storyIsPaused=false;
+  synth.cancel();
   document.getElementById('storyPlayBtn').disabled=true;
   document.getElementById('storyPauseBtn').disabled=false;document.getElementById('storyPauseBtn').style.opacity='1';
   document.getElementById('storyPauseBtn').textContent='⏸ 暂停';
   document.getElementById('storyStopBtn').disabled=false;document.getElementById('storyStopBtn').style.opacity='1';
-  for(let i=startIdx;i<STORY.length;i++){
-    storyPauseIdx=i;
-    if(storyStopped||!storyPlaying)break;
-    document.querySelectorAll('.pb').forEach(pb=>{
-      const pi=parseInt(pb.dataset.pi);
-      if(pi===i)pb.classList.add('hl');else pb.classList.remove('hl');
-    });
-    await speakAndWait(STORY[i].text,0.82);
-    if(!storyPlaying)break;
-    await new Promise(r=>setTimeout(r,350));
+  setTimeout(()=>storyPlayLine(startIdx),120);
+}
+function storyPlayLine(i){
+  if(storyStopped||!storyPlaying||i>=STORY.length){storyFinish();return;}
+  storyPauseIdx=i;
+  document.querySelectorAll('.pb').forEach(pb=>{
+    const pi=parseInt(pb.dataset.pi);
+    if(pi===i)pb.classList.add('hl');else pb.classList.remove('hl');
+  });
+  const u=new SpeechSynthesisUtterance(STORY[i].text);
+  u.lang='zh-CN';u.rate=0.82;
+  if(zhVoice)u.voice=zhVoice;
+  let advanced=false;
+  function next(){
+    if(advanced)return;advanced=true;
+    if(storyStopped||!storyPlaying||storyIsPaused){return;}
+    setTimeout(()=>storyPlayLine(i+1),350);
   }
+  u.onend=next;u.onerror=next;
+  synth.speak(u);
+  setTimeout(next,Math.max(3500,STORY[i].text.length*420));
+}
+function storyFinish(){
   document.querySelectorAll('.pb').forEach(pb=>pb.classList.remove('hl'));
-  storyPlaying=false;
-  if(!storyIsPaused){
-    storyPauseIdx=0;
-    document.getElementById('storyPlayBtn').disabled=false;
-    document.getElementById('storyPauseBtn').disabled=true;document.getElementById('storyPauseBtn').style.opacity='.5';
-    document.getElementById('storyPauseBtn').textContent='⏸ 暂停';
-    document.getElementById('storyStopBtn').disabled=true;document.getElementById('storyStopBtn').style.opacity='.5';
-  }
+  storyPlaying=false;storyPauseIdx=0;
+  document.getElementById('storyPlayBtn').disabled=false;
+  document.getElementById('storyPauseBtn').disabled=true;document.getElementById('storyPauseBtn').style.opacity='.5';
+  document.getElementById('storyPauseBtn').textContent='⏸ 暂停';
+  document.getElementById('storyStopBtn').disabled=true;document.getElementById('storyStopBtn').style.opacity='.5';
 }
 function storyPause(){
   if(storyIsPaused){
     storyIsPaused=false;
     document.getElementById('storyPauseBtn').textContent='⏸ 暂停';
-    setTimeout(()=>storyPlay(storyPauseIdx),200);
+    storyPlayLine(storyPauseIdx);
   }else{
     storyIsPaused=true;storyPlaying=false;synth.cancel();
     document.getElementById('storyPauseBtn').textContent='▶ 继续';
   }
 }
-function storyStop(){storyStopped=true;synth.cancel();storyPlaying=false;
+function storyStop(){storyStopped=true;synth.cancel();storyPlaying=false;storyIsPaused=false;
   document.querySelectorAll('.pb').forEach(pb=>pb.classList.remove('hl'));
   document.getElementById('storyPlayBtn').disabled=false;
   document.getElementById('storyPauseBtn').disabled=true;document.getElementById('storyPauseBtn').style.opacity='.5';

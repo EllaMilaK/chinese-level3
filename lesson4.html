@@ -82,10 +82,13 @@ header h1 span{font-size:0.9rem;color:rgba(255,255,255,0.8);display:block;margin
 .pb .ch{font-size:1.2rem;transition:color .15s;color:var(--text);}
 .pb:hover .ch{color:var(--accent);}
 .pb.hl .ch{color:var(--story-hl-text);background:var(--story-hl-bg);border-radius:3px;}
+.pb.new-word .ch{color:#2e7d32;font-weight:700;}
 .char-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;}
 .char-card{background:var(--card-bg);border:2px solid var(--border);border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all .22s;position:relative;box-shadow:var(--shadow);}
 .char-card:hover{transform:translateY(-3px);border-color:var(--accent2);}
 .char-card.active{border-color:var(--accent);background:var(--char-active-bg);}
+.char-card.done{border-color:#43a047;}
+.char-done-badge{position:absolute;top:5px;left:7px;background:#43a047;color:#fff;font-size:0.62rem;font-weight:700;padding:1px 6px;border-radius:8px;line-height:1.5;}
 .char-big{font-size:2.8rem;line-height:1.1;margin-bottom:4px;color:var(--text);}
 .char-pinyin{font-size:0.82rem;color:var(--accent2);margin-bottom:2px;}
 .char-meaning{font-size:0.72rem;color:var(--text2);}
@@ -215,8 +218,8 @@ header h1 span{font-size:0.9rem;color:rgba(255,255,255,0.8);display:block;margin
 .bingo-msg{text-align:center;font-size:0.88rem;color:var(--text2);min-height:20px;}
 .bingo-win-banner{text-align:center;font-size:1.5rem;color:var(--accent);display:none;animation:popIn .5s;}
 @keyframes popIn{0%{transform:scale(0);opacity:0}80%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
-.bingo-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;width:min(calc(100vw - 64px),340px);}
-.bingo-cell{aspect-ratio:1;background:var(--bingo-cell-bg);border:1.5px solid var(--border2);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .18s;text-align:center;padding:2px;font-weight:600;color:var(--text);word-break:break-all;line-height:1.15;overflow:hidden;}
+.bingo-grid{display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(5,1fr);gap:4px;width:100%;height:calc(100dvh - 195px);}
+.bingo-cell{background:var(--bingo-cell-bg);border:1.5px solid var(--border2);border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .18s;text-align:center;padding:3px;font-weight:600;color:var(--text);word-break:break-all;line-height:1.2;overflow:hidden;font-size:clamp(0.72rem,3.5vw,1.0rem);min-height:0;}
 .bingo-cell:hover{border-color:var(--accent);transform:scale(1.04);}
 .bingo-cell.marked{background:var(--bingo-marked-bg);border-color:var(--accent);color:var(--accent);}
 .bingo-cell.bingo-win{background:var(--accent);color:var(--btn-primary-text);border-color:var(--accent);font-weight:700;animation:bingoPop .4s;}
@@ -263,6 +266,26 @@ header h1 span{font-size:0.9rem;color:rgba(255,255,255,0.8);display:block;margin
 .cpc{position:fixed;width:9px;height:9px;border-radius:2px;animation:cfFall 1.4s ease-in forwards;pointer-events:none;z-index:1000;}
 @keyframes cfFall{0%{transform:translateY(-20px) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
 @media(max-width:480px){header h1{font-size:1.4rem;}.char-grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));}.match-grid{grid-template-columns:repeat(3,1fr);}}
+
+/* ── MCQ OPTIONS (句型 tab exercises) ── */
+.mcq-opts{display:flex;flex-wrap:wrap;gap:7px;margin:6px 0 8px;}
+.mcq-opts-v{flex-direction:column;}
+.mcq-opt{background:var(--card-bg);border:2px solid var(--border2);border-radius:10px;padding:9px 16px;cursor:pointer;font-size:0.92rem;color:var(--text);transition:all .18s;text-align:left;line-height:1.45;}
+.mcq-opt:hover:not(:disabled){border-color:var(--accent);background:var(--char-active-bg);}
+.mcq-opt.correct{border-color:#43a047;background:rgba(67,160,71,0.15);font-weight:700;}
+.mcq-opt.wrong{border-color:#e53935;background:rgba(229,57,53,0.1);}
+.mcq-opt:disabled{cursor:default;}
+.fill-fb,.tfm-fb{font-size:0.85rem;min-height:18px;margin-top:3px;}
+/* ── BINGO CENTER CALLER CELL ── */
+.bingo-cell.caller-center{background:var(--accent)!important;border-color:var(--accent)!important;cursor:pointer!important;flex-direction:column;gap:1px;}
+.bingo-cell.caller-center:hover{transform:scale(1.05);box-shadow:0 0 14px rgba(0,0,0,0.25);}
+.caller-label-in{font-size:0.6rem;color:rgba(255,255,255,0.9);font-weight:700;line-height:1.3;}
+.caller-word-in{font-size:1.05rem;font-weight:800;color:#fff;line-height:1.2;}
+.caller-hint-in{font-size:0.58rem;color:rgba(255,255,255,0.85);line-height:1.3;text-align:center;}
+.rsb{display:flex;align-items:center;gap:8px;}
+.rsb-play-btn{flex-shrink:0;background:var(--btn-sec-bg);border:1px solid var(--border2);color:var(--accent);border-radius:10px;padding:5px 10px;font-size:1.1rem;cursor:pointer;}
+.rsb-play-btn:hover{background:var(--btn-sec-hover);}
+
 </style>
 </head>
 <body>
@@ -489,28 +512,15 @@ header h1 span{font-size:0.9rem;color:rgba(255,255,255,0.8);display:block;margin
 </div>
 
 <!-- TAB 7: BINGO -->
-<div id="tab-bingo" class="tab-panel">
-  <div class="card">
-    <div class="bingo-compact">
-      <div class="bingo-top">
-        <button class="btn btn-primary btn-sm" onclick="callBingo()">📢 叫字！</button>
-        <button class="btn btn-secondary btn-sm" onclick="initBingo()">🔄 新游戏</button>
-        <span class="bingo-score" id="bScore">连线: 0</span>
-        <span id="bingoMsg" class="bingo-msg" style="flex:1;text-align:right"></span>
-      </div>
-      <div class="caller-box">
-        <div style="font-size:2.4rem">🐝</div>
-        <div class="caller-info">
-          <div class="caller-label">找找这个 ↓</div>
-          <div class="caller-word" id="callerWord">点击"叫字"！</div>
-          <div class="caller-hint" id="callerHint"></div>
-        </div>
-      </div>
-      <div class="bingo-win-banner" id="bingoWin">🎉 BINGO! 恭喜你赢了！🎉</div>
-      <div class="bingo-grid" id="bingoGrid"></div>
-      <div class="bingo-tip">5个连成一线（横、竖、斜）就赢！中间格是🍯FREE！</div>
-    </div>
+<div id="tab-bingo" class="tab-panel" style="padding:8px 8px 4px;">
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;flex-wrap:wrap;">
+    <button class="btn btn-secondary btn-sm" onclick="initBingo()">🔄 新游戏</button>
+    <span class="bingo-score" id="bScore">连线: 0</span>
+    <span id="bingoMsg" style="flex:1;text-align:right;font-size:0.8rem;color:var(--accent)"></span>
   </div>
+  <div class="bingo-win-banner" id="bingoWin">🎉 BINGO! 恭喜你赢了！🎉</div>
+  <div class="bingo-grid" id="bingoGrid"></div>
+  <div style="font-size:0.68rem;color:var(--text2);text-align:center;padding:4px 0 0">5个连成一线（横、竖、斜）就赢！点中间格叫字！</div>
 </div>
 
 <!-- TAB 8: GAMES -->
@@ -557,7 +567,6 @@ header h1 span{font-size:0.9rem;color:rgba(255,255,255,0.8);display:block;margin
     <div class="rec-disp" id="rDisp">← 点击上面的句子</div>
     <div class="rec-py" id="rPy"></div>
     <div class="rec-ctrl">
-      <button class="btn btn-secondary" onclick="playRefTTS()">🔊 听示范</button>
       <button class="btn btn-danger" id="mRecBtn" onclick="toggleMainRec()">⏺ 开始录音</button>
       <button class="btn btn-secondary" id="mPlayBtn" disabled onclick="playMainRec()">▶ 我的录音</button>
       <button class="btn btn-secondary" id="mDlBtn" disabled onclick="downloadRec()">💾 保存</button>
@@ -598,113 +607,223 @@ const STROKE_NAMES = {
   '只':['竖','横折','横','撇','点'],
   '朵':['撇','横','竖钩','撇','横','竖'],
   '嘴':['竖','横折','横','横','撇','点','横折','横','点','撇','横折钩','横','竖','横折','横','横'],
-  '边':['撇','折','点','横折折撇','捺'],
+  '边':['撇','横折','点','横折折撇','捺'],
   '传':['撇','竖','点','横','横折','撇','横撇','捺'],
   '粉':['撇','横','竖','撇','点','撇','横','竖钩','撇','点'],
   '采':['撇','点','撇','点','横','竖','撇','捺'],
   '蜜':['点','撇','横','横折钩','撇','竖','横折','横','撇','捺','横','竖','横','横'],
   '劳':['横','竖折','点','撇','横','竖钩','横','撇'],
-  '动':['横','撇','竖','折','横','撇']
+  '动':['横','撇','竖','横折钩','横','撇']
 };
 
 const RADICAL_DATA = {
   '猜':{
-    intro:'偏旁：扌（手旁），表示用思维"抓住"答案',
-    introEn:'Radical: 扌 (hand) — to "grab" the answer with your mind',
-    oracle:'猜字由扌（手）和月（月亮）和隹（鸟）组成，古人用手指向天空猜谜',
-    oracleEn:'猜 combines 扌(hand) + 月(moon) + 隹(bird) — ancient riddles often asked about nature',
-    groups:[{radical:'扌（手旁）',chars:[{char:'打',py:'dǎ',word:'打球（play ball）'},{char:'拍',py:'pāi',word:'拍手（clap）'},{char:'拿',py:'ná',word:'拿书（hold book）'}]}]
+    intro:'部件：犭（反犬旁）＋ 月＋ 隹（鸟）',
+    introEn:'Components: 犭(dog/animal radical) + 月 (moon) + 隹 (bird)',
+    oracle:'甲骨文中，"犭"（犬旁）画的是一只狗的侧面形象。狗的嗅觉非常灵敏，能通过气味"猜"出很多事情！所以"猜"字用犭表示：像动物一样用直觉去"感知"答案。',
+    oracleEn:'In oracle bone script, 犭 (dog radical) shows a dog in profile. Dogs have an incredible sense of smell — they can "guess" so much from a sniff! 猜 uses 犭 because guessing uses intuition, like an animal sensing things.',
+    groups:[
+      {radical:'犭（反犬旁，动物习性）',chars:[
+        {char:'猫',py:'māo',word:'小猫（kitten）'},
+        {char:'狗',py:'gǒu',word:'小狗（puppy）'},
+        {char:'狐',py:'hú',word:'狐狸（fox）'},
+        {char:'猪',py:'zhū',word:'小猪（piglet）'},
+        {char:'狮',py:'shī',word:'狮子（lion）'}
+      ]}
+    ]
   },
   '鼻':{
-    intro:'象形字，像人的鼻子的形状，自（自己）在下面',
-    introEn:'Pictograph of a nose! The character 自 (self) is at the bottom — ancient people pointed to their nose to mean "me"',
-    oracle:'古人指着鼻子说"这是我"，所以鼻和自（自己）有关',
-    oracleEn:'In ancient China, pointing to your nose meant "me" — that\'s why 鼻 is related to 自 (self/oneself)',
-    groups:[{radical:'鼻',chars:[{char:'鼻子',py:'bízi',word:'nose'},{char:'鼻孔',py:'bíkǒng',word:'nostril'}]}]
+    intro:'象形字：上部描绘鼻子形状，下部是"自"（自己）',
+    introEn:'Pictograph! Top part draws the shape of a nose; 自 (self) at bottom — ancient people pointed to their nose to say "me"!',
+    oracle:'甲骨文中，"自"本来就是鼻子的象形——一个人的脸，中间有一个突出的鼻子。古人指着自己鼻子说"这是我"，所以"自"就有了"自己"的意思。"鼻"在"自"上面再加了一个更大的鼻子形状！',
+    oracleEn:'In oracle bone script, 自 WAS the nose — a face with a protruding nose in the middle! Ancient people pointed to their nose saying "this is me," so 自 came to mean "self." 鼻 adds more nose detail on top of 自!',
+    groups:[
+      {radical:'自（自己，鼻子的原形）',chars:[
+        {char:'自',py:'zì',word:'自己（oneself）'},
+        {char:'息',py:'xī',word:'呼吸（breathe）'},
+        {char:'臭',py:'chòu',word:'臭味（stinky smell）'},
+        {char:'鼻',py:'bí',word:'鼻子（nose）'}
+      ]}
+    ]
   },
   '眼':{
-    intro:'偏旁：目（眼睛），表示与眼睛、视觉有关',
-    introEn:'Radical: 目 (eye) — characters with 目 relate to eyes and seeing',
-    oracle:'目是眼睛的象形字，外面的方框是眼睑，里面是眼珠',
-    oracleEn:'目 is a pictograph of an eye: the rectangle is the eyelid, the lines inside are the pupil',
-    groups:[{radical:'目（眼旁）',chars:[{char:'看',py:'kàn',word:'看书（read）'},{char:'睛',py:'jīng',word:'眼睛（eyes）'},{char:'睡',py:'shuì',word:'睡觉（sleep）'}]}]
+    intro:'部件：目（眼睛）＋ 艮（声旁）',
+    introEn:'Components: 目 (eye radical) + 艮 (phonetic)',
+    oracle:'甲骨文中，"目"画的是一只眼睛的形状——外面是眼眶，里面是眼珠。竖着写的眼睛后来变成了方块形的"目"。凡是带"目"的字，大多和眼睛、视觉有关！',
+    oracleEn:'In oracle bone script, 目 is a drawing of an eye — the outer shape is the eyelid, the lines inside are the pupil. The eye was drawn vertically then rotated to become the square 目. Every character with 目 relates to eyes and seeing!',
+    groups:[
+      {radical:'目（目字旁，眼睛和视觉）',chars:[
+        {char:'看',py:'kàn',word:'看书（read a book）'},
+        {char:'睛',py:'jīng',word:'眼珠（eyeball）'},
+        {char:'睡',py:'shuì',word:'睡觉（sleep）'},
+        {char:'盲',py:'máng',word:'盲人（blind person）'},
+        {char:'眉',py:'méi',word:'眉毛（eyebrows）'}
+      ]}
+    ]
   },
   '晴':{
-    intro:'偏旁：日（太阳），青（蓝绿色）。有太阳的蓝色天空就是晴天',
-    introEn:'Radical: 日 (sun) + 青 (blue-green). A sunny blue sky = 晴 (clear weather)!',
-    oracle:'日（太阳）加青（蓝绿色）= 晴天，天空蓝蓝的，太阳高挂',
-    oracleEn:'Sun (日) + Blue (青) = Clear day. When the sun is out, the sky turns bright blue!',
-    groups:[{radical:'日（日旁）',chars:[{char:'明',py:'míng',word:'明天（tomorrow）'},{char:'时',py:'shí',word:'时间（time）'},{char:'早',py:'zǎo',word:'早上（morning）'}]}]
+    intro:'部件：日（太阳）＋ 青（蓝绿色）',
+    introEn:'Components: 日 (sun) + 青 (blue-green) — a sky with sun that is bright blue = clear weather!',
+    oracle:'甲骨文中，"日"画的是一个圆圈中间有一点——太阳中间的光点（太阳黑子）。"晴"字告诉我们：当太阳出来，天空变成青蓝色，就是晴天了！',
+    oracleEn:'In oracle bone script, 日 shows a circle with a dot inside — the dark spot at the center of the sun! 晴 tells us: when the sun (日) comes out and the sky turns blue-green (青), it\'s a clear sunny day!',
+    groups:[
+      {radical:'日（日字旁，太阳和时间）',chars:[
+        {char:'明',py:'míng',word:'明天（tomorrow）'},
+        {char:'时',py:'shí',word:'时间（time）'},
+        {char:'早',py:'zǎo',word:'早上（morning）'},
+        {char:'晚',py:'wǎn',word:'晚上（evening）'},
+        {char:'暖',py:'nuǎn',word:'暖和（warm）'}
+      ]}
+    ]
   },
   '只':{
-    intro:'多音字：zhī（量词，用于动物）/ zhǐ（副词，表示仅仅）',
-    introEn:'Polyphonic character: zhī = measure word for animals & birds; zhǐ = only, just',
-    oracle:'只字像一只手，古人用手数小动物，一只、两只……',
-    oracleEn:'只 resembles a hand counting small animals — one by one: 一只、两只...',
-    groups:[{radical:'口',chars:[{char:'叫',py:'jiào',word:'叫声（sound）'},{char:'口',py:'kǒu',word:'口水（saliva）'}]}]
+    intro:'多音字：zhī（量词，用于小动物）/ zhǐ（副词，仅仅）',
+    introEn:'Polyphonic: zhī = measure word for animals & birds (一只猫); zhǐ = only/just (只有一个)',
+    oracle:'甲骨文中，"只"像一只张开的手，表示用手抓取或数数量。古人用手抓小动物，一只、两只、三只……慢慢地"只"变成了数动物的量词！',
+    oracleEn:'In oracle bone script, 只 looks like an open hand — grabbing or counting. Ancient people caught small animals one by one with their hands. Over time, 只 became the counter for small animals: 一只猫, 两只鸟!',
+    groups:[
+      {radical:'口（口部，与嘴和声音有关）',chars:[
+        {char:'叫',py:'jiào',word:'叫声（animal sounds）'},
+        {char:'吃',py:'chī',word:'吃东西（eat things）'},
+        {char:'唱',py:'chàng',word:'唱歌（sing songs）'},
+        {char:'喝',py:'hē',word:'喝水（drink water）'},
+        {char:'吗',py:'ma',word:'是吗？（really?）'}
+      ]}
+    ]
   },
   '朵':{
-    intro:'朵字上面是几（几个），下面是木（木头）。像树上的花朵',
-    introEn:'朵 shows 几 (several) on top of 木 (tree/wood) — like flowers blooming on a branch',
-    oracle:'一朵花，两朵云，三朵浪花——朵用来计数自然界圆形的事物',
-    oracleEn:'一朵花, 两朵云, 三朵浪花 — 朵counts round, bunched natural things like flowers and clouds',
-    groups:[{radical:'木',chars:[{char:'树',py:'shù',word:'大树（big tree）'},{char:'花',py:'huā',word:'花朵（flower）'},{char:'林',py:'lín',word:'树林（forest）'}]}]
+    intro:'部件：几（几个）＋ 木（树木）',
+    introEn:'Components: 几 (several) on top of 木 (tree/wood) — clusters blooming on branches!',
+    oracle:'甲骨文中，"木"画的是一棵树——上面是树枝，中间是树干，下面是树根。"朵"表示树上开出一簇簇花，一朵花、两朵云，都用"朵"来数！',
+    oracleEn:'In oracle bone script, 木 shows a tree — branches on top, trunk in middle, roots below. 朵 shows clusters blooming on trees. We use 朵 to count round, clustered things: 一朵花 (a flower), 两朵云 (two clouds)!',
+    groups:[
+      {radical:'木（木字旁，树木和木制品）',chars:[
+        {char:'树',py:'shù',word:'大树（big tree）'},
+        {char:'林',py:'lín',word:'树林（forest）'},
+        {char:'桌',py:'zhuō',word:'桌子（desk）'},
+        {char:'椅',py:'yǐ',word:'椅子（chair）'},
+        {char:'桥',py:'qiáo',word:'小桥（small bridge）'}
+      ]}
+    ]
   },
   '嘴':{
-    intro:'偏旁：口（嘴）。嘴是我们吃饭、说话的地方',
-    introEn:'Radical: 口 (mouth). 嘴 is where we eat and speak',
-    oracle:'嘴字很复杂，有16画！口部表示与嘴有关',
-    oracleEn:'嘴 has 16 strokes — one of the more complex characters! The 口 radical shows it relates to the mouth',
-    groups:[{radical:'口（口旁）',chars:[{char:'吃',py:'chī',word:'吃饭（eat）'},{char:'说',py:'shuō',word:'说话（speak）'},{char:'唱',py:'chàng',word:'唱歌（sing）'}]}]
+    intro:'部件：口（嘴）是偏旁，嘴巴是吃饭说话的地方',
+    introEn:'Radical: 口 (mouth) — 嘴 is where we eat, speak, and taste!',
+    oracle:'甲骨文中，"口"画的是一个张开的嘴巴——简单的方形或圆形，表示"开口说话"。"嘴"字里的"口"告诉我们：嘴是人体上非常重要的器官，能说话、能吃东西、能唱歌！',
+    oracleEn:'In oracle bone script, 口 is a simple open mouth shape — a square or round opening. The 口 in 嘴 shows that the mouth is one of our most important features: we eat, speak, and sing with it!',
+    groups:[
+      {radical:'口（口字旁，嘴和声音）',chars:[
+        {char:'吃',py:'chī',word:'吃饭（eat a meal）'},
+        {char:'说',py:'shuō',word:'说话（speak）'},
+        {char:'唱',py:'chàng',word:'唱歌（sing a song）'},
+        {char:'喝',py:'hē',word:'喝水（drink water）'},
+        {char:'问',py:'wèn',word:'问问题（ask a question）'}
+      ]}
+    ]
   },
   '边':{
-    intro:'偏旁：辶（走之旁），表示走路、边界',
-    introEn:'Radical: 辶 (walking radical) — 边 means a side or border you can walk along',
-    oracle:'辶表示行走，边是路的旁边，也是事物的边界',
-    oracleEn:'辶 shows movement — 边 is the side of a road or the edge of something',
-    groups:[{radical:'辶（走之旁）',chars:[{char:'这',py:'zhè',word:'这里（here）'},{char:'那',py:'nà',word:'那边（over there）'},{char:'过',py:'guò',word:'过去（past）'}]}]
+    intro:'部件：辶（走之旁）＋ 刀（声旁）',
+    introEn:'Components: 辶 (movement radical) + 刀 (phonetic) — a border you walk along',
+    oracle:'甲骨文中，"辶"（走之底）描绘脚向前走的动作。"边"的意思是路的旁边、物体的边界。古代画地图时，要沿着国界走一圈——走一圈的轨迹就是"边"！',
+    oracleEn:'In oracle bone script, 辶 shows footsteps moving forward. 边 means the side of a road or the boundary of something. Ancient mapmakers walked along borders to trace them — the path they walked became 边!',
+    groups:[
+      {radical:'辶（走之旁，行走和移动）',chars:[
+        {char:'这',py:'zhè',word:'这里（right here）'},
+        {char:'过',py:'guò',word:'过马路（cross the road）'},
+        {char:'远',py:'yuǎn',word:'很远（very far）'},
+        {char:'进',py:'jìn',word:'进来（come in）'},
+        {char:'道',py:'dào',word:'道路（road）'}
+      ]}
+    ]
   },
   '传':{
-    intro:'偏旁：亻（人旁），表示人与人之间传递信息',
-    introEn:'Radical: 亻 (person) — transmission between people',
-    oracle:'传字表示从一个人传给另一个人，传递、传说都有这个意思',
-    oracleEn:'传 means passing something from person to person — like passing a message or a legend',
-    groups:[{radical:'亻（人旁）',chars:[{char:'你',py:'nǐ',word:'你好（hello）'},{char:'他',py:'tā',word:'他们（they）'},{char:'做',py:'zuò',word:'做工（work）'}]}]
+    intro:'部件：亻（人字旁）＋ 专（声旁）',
+    introEn:'Components: 亻 (person radical) + 专 (phonetic) — passing things from person to person',
+    oracle:'甲骨文中，"亻"是一个人站立的侧面形象——一撇是头和身体，一竖是腿。"传"表示从一个人把东西交给另一个人，传递、传说、传统……都是从人传到人的！',
+    oracleEn:'In oracle bone script, 亻 is a person standing sideways — one stroke for the upper body, one for the legs. 传 means passing from one person to the next: 传递 (relay), 传说 (legend), 传统 (tradition) — all go person to person!',
+    groups:[
+      {radical:'亻（人字旁，与人有关）',chars:[
+        {char:'你',py:'nǐ',word:'你好（hello）'},
+        {char:'他',py:'tā',word:'他们（they/them）'},
+        {char:'做',py:'zuò',word:'做事（do things）'},
+        {char:'们',py:'men',word:'我们（we/us）'},
+        {char:'住',py:'zhù',word:'住家（live at home）'}
+      ]}
+    ]
   },
   '粉':{
-    intro:'偏旁：米（米粒）。花粉像细细的米粒，粉红色',
-    introEn:'Radical: 米 (rice/grain) — pollen is like tiny grains of rice; 粉 also means pink!',
-    oracle:'粉是细细的东西，像磨碎的米。花粉、粉笔、粉红都是粉',
-    oracleEn:'粉 = fine powder (like ground rice). 花粉 = pollen, 粉笔 = chalk, 粉红 = pink!',
-    groups:[{radical:'米',chars:[{char:'糖',py:'táng',word:'糖果（candy）'},{char:'粒',py:'lì',word:'米粒（grain）'}]}]
+    intro:'部件：米（米粒）＋ 分（声旁）',
+    introEn:'Components: 米 (rice/grain) + 分 (phonetic) — powder is like finely ground rice!',
+    oracle:'甲骨文中，"米"画的是一粒一粒散开的谷粒——中间一竖是茎，两边的点是谷粒。古代把米磨碎就成了"粉"。花粉也像细细的粉末，所以用"米"字旁！',
+    oracleEn:'In oracle bone script, 米 shows scattered grains — a central stem with dots of grain on both sides. Grinding rice into tiny pieces makes 粉 (powder/flour). Pollen is also like fine powder, so it uses the 米 radical!',
+    groups:[
+      {radical:'米（米字旁，粮食和粉末）',chars:[
+        {char:'糖',py:'táng',word:'糖果（candy）'},
+        {char:'粒',py:'lì',word:'米粒（grain of rice）'},
+        {char:'粥',py:'zhōu',word:'米粥（rice porridge）'},
+        {char:'精',py:'jīng',word:'精神（spirit/energy）'},
+        {char:'粗',py:'cū',word:'粗心（careless）'}
+      ]}
+    ]
   },
   '采':{
-    intro:'采字上面是爪（爪子），下面是木（树木）。手伸进树里摘花',
-    introEn:'采 shows 爪 (claw/hand) above 木 (tree) — reaching into a tree to pick flowers or fruit!',
-    oracle:'采字像一只手伸进树里摘果子，采花粉、采蘑菇',
-    oracleEn:'Imagine a hand reaching into a tree to pick things — that\'s 采 in action! 采花粉, 采蘑菇',
-    groups:[{radical:'爪',chars:[{char:'爱',py:'ài',word:'爱好（hobby）'},{char:'受',py:'shòu',word:'接受（accept）'}]}]
+    intro:'象形字：爪（手）在上，木（树）在下，手伸进树里摘东西',
+    introEn:'Pictograph: 爪 (hand/claw) above 木 (tree) — a hand reaching into a tree to pick things!',
+    oracle:'甲骨文中，"采"画的是一只手从上方伸进一棵树，摘取果子或花朵的样子。蜜蜂采花、我们摘果子——都是"采"的动作。"采"还出现在很多其他字里面！',
+    oracleEn:'In oracle bone script, 采 shows a hand reaching down from above into a tree — picking fruit or flowers. Bees 采花 (collect nectar), we 采果子 (pick fruit). 采 also hides inside many other characters!',
+    groups:[
+      {radical:'采（采字，在其他字里面）',chars:[
+        {char:'彩',py:'cǎi',word:'彩色（colorful）'},
+        {char:'菜',py:'cài',word:'蔬菜（vegetables）'},
+        {char:'踩',py:'cǎi',word:'踩花粉（step on pollen）'},
+        {char:'彬',py:'bīn',word:'彬彬有礼（well-mannered）'}
+      ]}
+    ]
   },
   '蜜':{
-    intro:'偏旁：虫（虫旁），蜜蜂是一种虫。蜜字底部有虫',
-    introEn:'Radical: 虫 (insect) — bees are insects, and they make 蜜 (honey)!',
-    oracle:'蜜字由宀（房子）、必（一定）、虫（虫子）组成——蜜蜂一定住在房子里做蜜',
-    oracleEn:'蜜 combines roof (宀) + must (必) + insect (虫) — bees MUST live in a hive to make honey!',
-    groups:[{radical:'虫（虫旁）',chars:[{char:'蜂',py:'fēng',word:'蜜蜂（honeybee）'},{char:'蚂',py:'mǎ',word:'蚂蚁（ant）'},{char:'蝴',py:'hú',word:'蝴蝶（butterfly）'}]}]
+    intro:'部件：宀（屋顶）＋ 必（一定）＋ 虫（昆虫）',
+    introEn:'Components: 宀 (roof/hive) + 必 (must) + 虫 (insect) — bees MUST live in a hive to make honey!',
+    oracle:'甲骨文中，"虫"画的是一条蛇或虫子的形状——头在上，身体弯弯曲曲。古代"虫"代表所有小动物，包括昆虫、蛇、蚕。蜜蜂住在蜂巢（宀）里，一定（必）会做出蜜，所以叫"蜜"！',
+    oracleEn:'In oracle bone script, 虫 shows a snake or worm — head on top, winding body below. Ancient Chinese used 虫 for all small creatures: insects, snakes, worms. Bees live in a hive (宀) and MUST (必) make honey — that\'s 蜜!',
+    groups:[
+      {radical:'虫（虫字旁，昆虫和小动物）',chars:[
+        {char:'蜂',py:'fēng',word:'蜜蜂（honeybee）'},
+        {char:'蚂',py:'mǎ',word:'蚂蚁（ant）'},
+        {char:'蝴',py:'hú',word:'蝴蝶（butterfly）'},
+        {char:'蝶',py:'dié',word:'蝴蝶（butterfly）'},
+        {char:'蚊',py:'wén',word:'蚊子（mosquito）'}
+      ]}
+    ]
   },
   '劳':{
-    intro:'偏旁：力（力气）。劳动需要力气',
-    introEn:'Radical: 力 (strength/power) — labor requires effort and strength',
-    oracle:'劳字上面是草字头（植物），下面是力。古人在田地里劳动很辛苦',
-    oracleEn:'劳 has grass/plants (艹) on top and strength (力) below — ancient farm labor was hard work in the fields',
-    groups:[{radical:'力',chars:[{char:'动',py:'dòng',word:'运动（exercise）'},{char:'努',py:'nǔ',word:'努力（try hard）'},{char:'加',py:'jiā',word:'加油（go!）'}]}]
+    intro:'部件：艹（草字头）＋ 冖（覆盖）＋ 力（力气）',
+    introEn:'Components: 艹 (grass/plants) + 冖 (covering) + 力 (strength) — hard labor in the fields!',
+    oracle:'甲骨文中，"力"画的是一把犁的形状——古代农具，用来翻土种庄稼，需要很大力气。"劳"字表示在田地里（艹）劳动，需要用力（力），非常辛苦！',
+    oracleEn:'In oracle bone script, 力 looks like an ancient plow — a farming tool for turning soil, which took great strength. 劳 shows working in the fields (艹) with all your strength (力) — hard physical labor!',
+    groups:[
+      {radical:'力（力字旁，力量和努力）',chars:[
+        {char:'动',py:'dòng',word:'运动（exercise）'},
+        {char:'努',py:'nǔ',word:'努力（try hard）'},
+        {char:'功',py:'gōng',word:'成功（success）'},
+        {char:'勤',py:'qín',word:'勤劳（hardworking）'},
+        {char:'加',py:'jiā',word:'加油（keep it up!）'}
+      ]}
+    ]
   },
   '动':{
-    intro:'偏旁：力（力气）。动作需要力气和运动',
-    introEn:'Radical: 力 (strength) — movement takes energy and force',
-    oracle:'动字右边是力，表示用力移动。运动、动物、动作都包含运动的意思',
-    oracleEn:'力 (strength) on the right shows that 动 (movement) takes power — 运动, 动物, 动作 all involve movement',
-    groups:[{radical:'力',chars:[{char:'劳',py:'láo',word:'劳动（labor）'},{char:'努',py:'nǔ',word:'努力（effort）'},{char:'功',py:'gōng',word:'功课（homework）'}]}]
+    intro:'部件：云（左部）＋ 力（力气）',
+    introEn:'Components: cloud-like left part + 力 (strength) — movement takes power!',
+    oracle:'甲骨文中，"力"的形状像一个人弯腰用力推东西，或者像一把犁。"动"就是"用力使物体移动"。运动、动物、动作、感动……所有"动"字都有"移动或变化"的意思！',
+    oracleEn:'In oracle bone script, 力 shows a person pushing with all their might, or a plow in action. 动 = "using force to cause movement." 运动, 动物, 动作, 感动 — all 动 characters involve moving or changing!',
+    groups:[
+      {radical:'力（力字旁，力量和动作）',chars:[
+        {char:'劳',py:'láo',word:'劳动（work hard）'},
+        {char:'努',py:'nǔ',word:'努力（put in effort）'},
+        {char:'功',py:'gōng',word:'功课（homework）'},
+        {char:'勤',py:'qín',word:'勤快（diligent）'},
+        {char:'力',py:'lì',word:'力气（strength）'}
+      ]}
+    ]
   }
 };
 
@@ -905,8 +1024,12 @@ function speak(text,onEnd){
     const u=new SpeechSynthesisUtterance(text);
     u.lang='zh-CN'; u.rate=0.82; u.pitch=1.05;
     if(zhVoice) u.voice=zhVoice;
-    if(onEnd) u.onend=onEnd;
-    u.onerror=()=>{if(onEnd)onEnd();};
+    if(onEnd){
+      let done=false;
+      function finish(){if(!done){done=true;onEnd();}}
+      u.onend=finish;u.onerror=finish;
+      setTimeout(finish,Math.max(2800,text.length*300));
+    }
     speechSynthesis.speak(u);
   },80);
 }
@@ -938,14 +1061,16 @@ let showPY=true, storyPlaying=false, storyPaused=false, storyIdx=0;
 
 function buildStory(){
   const el=document.getElementById('storyText');
+  const newChars=new Set(CHARS.map(c=>c.char));
   el.innerHTML=STORY.map(para=>{
     let html='<div class="story-para">';
     para.ch.forEach((ch,i)=>{
       const py=para.py[i]||'';
+      const nw=newChars.has(ch)?' new-word':'';
       if(/[，。！？、：；""''（）【】…—]/.test(ch)){
-        html+=`<span class="pb"><span class="py" style="visibility:hidden">${py||'　'}</span><span class="ch">${ch}</span></span>`;
+        html+=`<span class="pb${nw}"><span class="py" style="visibility:hidden">${py||'　'}</span><span class="ch">${ch}</span></span>`;
       } else {
-        html+=`<span class="pb" onclick="speak('${ch}')"><span class="py" style="visibility:${showPY?'visible':'hidden'}">${py}</span><span class="ch">${ch}</span></span>`;
+        html+=`<span class="pb${nw}" onclick="speak('${ch}')"><span class="py" style="visibility:${showPY?'visible':'hidden'}">${py}</span><span class="ch">${ch}</span></span>`;
       }
     });
     return html+'</div>';
@@ -1011,6 +1136,18 @@ function storyStop(){
 // TAB 2: CHARACTERS
 // ═══════════════════════════════════════════════
 let curCharIdx=0,demoW=null,quizW=null;
+const writtenChars=new Set();
+function markCharDone(idx){
+  writtenChars.add(idx);
+  const cards=document.querySelectorAll('.char-card');
+  if(cards[idx]&&!cards[idx].querySelector('.char-done-badge')){
+    cards[idx].classList.add('done');
+    const b=document.createElement('div');
+    b.className='char-done-badge';
+    b.textContent='✓';
+    cards[idx].appendChild(b);
+  }
+}
 
 function buildCharGrid(){
   const grid=document.getElementById('charGrid');
@@ -1104,7 +1241,7 @@ function startQuizMode(){
       document.getElementById('strokeMsg').style.color='#2e7d32';
       if(document.getElementById('strokeAudioChk').checked) speak(name);
     },
-    onComplete:()=>{document.getElementById('strokeMsg').textContent='🎉 写完了！很棒！';launchConfetti();}
+    onComplete:()=>{document.getElementById('strokeMsg').textContent='🎉 写完了！很棒！';markCharDone(curCharIdx);launchConfetti();}
   });
 }
 
@@ -1298,55 +1435,35 @@ function buildPattern(){
       <div class="pe-py">${ex.py}</div>
       <div class="pe-en">${ex.en}</div>
     </div>`).join('');
-  document.getElementById('fillEx').innerHTML=FILL_EXERCISES.map((ex,i)=>`
-    <div class="fill-item">
-      <div class="fill-prompt">${ex.prompt}</div>
-      <input class="fill-input" id="fill${i}" placeholder="填写答案…" autocomplete="off">
-      <div class="fill-fb" id="fillfb${i}"></div>
-    </div>`).join('');
+  const fillAns=FILL_EXERCISES.map(ex=>ex.answers[0]);
+  document.getElementById('fillEx').innerHTML=FILL_EXERCISES.map((ex,i)=>{
+    const others=fillAns.filter(a=>a!==ex.answers[0]);
+    let pool=[...others];
+    if(pool.length<3)VOCAB.forEach(v=>{if(pool.length<3&&!pool.includes(v.word))pool.push(v.word);});
+    const opts=[ex.answers[0],...pool.sort(()=>Math.random()-.5).slice(0,3)].sort(()=>Math.random()-.5);
+    const optsHtml=opts.map(opt=>`<button class="mcq-opt" onclick="pickFill(${i},'${opt.replace(/'/g,"\'")}','${ex.answers[0].replace(/'/g,"\'")}',this)">${opt}</button>`).join('');
+    return `<div class="fill-item" style="margin-bottom:14px;"><div style="font-size:0.9rem;margin-bottom:5px;">${ex.prompt}</div><div class="mcq-opts" id="fopts${i}">${optsHtml}</div><div class="fill-fb" id="fillFb${i}"></div></div>`;
+  }).join('');
   document.getElementById('transformEx').innerHTML=TRANSFORM_EXERCISES.map((ex,i)=>`
-    <div class="transform-item">
-      <div class="transform-prompt">用"${PATTERN_KW}"改写：</div>
-      <div class="transform-src">${ex.src}</div>
-      <input class="transform-input" id="tfm${i}" placeholder="写出改写后的句子…" autocomplete="off">
-      <div class="transform-fb" id="tfmfb${i}"></div>
+    <div class="transform-item" style="margin-bottom:14px;">
+      <div style="font-size:0.8rem;color:var(--accent2);margin-bottom:4px;">用"${PATTERN_KW}"改写这句话：</div>
+      <div style="font-size:1rem;background:var(--stroke-area-bg);padding:8px 10px;border-radius:8px;margin-bottom:6px;">${ex.src}</div>
+      <details style="margin-top:4px;"><summary style="cursor:pointer;font-size:0.82rem;color:var(--accent2);">📖 参考（点击查看）</summary>
+      <div style="padding:6px 10px;font-size:0.9rem;color:var(--accent);margin-top:3px;">${ex.src.replace('。','，')}用"${PATTERN_KW}"...（自由发挥！）</div></details>
     </div>`).join('');
 }
 
 function checkFill(){
-  FILL_EXERCISES.forEach((ex,i)=>{
-    const v=(document.getElementById('fill'+i).value||'').trim();
-    const fb=document.getElementById('fillfb'+i);
-    const ok=ex.answers.some(a=>v===a||v.includes(a));
-    fb.textContent=ok?'✓ 正确！':'✗ 参考答案：'+ex.answers[0];
-    fb.className='fill-fb '+(ok?'ok':'no');
-    if(ok) launchConfetti();
+  document.querySelectorAll('[id^="fopts"]').forEach(opts=>{
+    opts.querySelectorAll('.mcq-opt').forEach(b=>{b.disabled=false;b.classList.remove('correct','wrong');});
   });
+  document.querySelectorAll('[id^="fillFb"]').forEach(fb=>{fb.innerHTML='';});
 }
-function resetFill(){
-  FILL_EXERCISES.forEach((_,i)=>{
-    document.getElementById('fill'+i).value='';
-    document.getElementById('fillfb'+i).textContent='';
-    document.getElementById('fillfb'+i).className='fill-fb';
-  });
-}
+function resetFill(){checkFill();}
 function checkTransform(){
-  TRANSFORM_EXERCISES.forEach((ex,i)=>{
-    const v=(document.getElementById('tfm'+i).value||'').trim();
-    const fb=document.getElementById('tfmfb'+i);
-    const ok=v.includes(PATTERN_KW);
-    fb.textContent=ok?`✓ 好！句子里有"${PATTERN_KW}"！`:`✗ 记得用"${PATTERN_KW}"句型`;
-    fb.className='transform-fb '+(ok?'ok':'no');
-    if(ok) launchConfetti();
-  });
+  // Transform exercises reveal answers via <details> — nothing to grade
 }
-function resetTransform(){
-  TRANSFORM_EXERCISES.forEach((_,i)=>{
-    document.getElementById('tfm'+i).value='';
-    document.getElementById('tfmfb'+i).textContent='';
-    document.getElementById('tfmfb'+i).className='transform-fb';
-  });
-}
+function resetTransform(){}
 
 // ═══════════════════════════════════════════════
 // TAB 6: EXTENDED READING
@@ -1452,17 +1569,27 @@ function initBingo(){
   bingoCalled=[];bingoLines=0;
   document.getElementById('bScore').textContent='连线: 0';
   document.getElementById('bingoWin').style.display='none';
-  document.getElementById('callerWord').textContent='点击"叫字"！';
-  document.getElementById('callerHint').textContent='';
   document.getElementById('bingoMsg').textContent='';
   const pool=[...BINGO_POOL].sort(()=>Math.random()-.5).slice(0,24);
   bingoBoard=pool.map(p=>({...p,marked:false}));
-  bingoBoard.splice(12,0,{show:'🍯',hint:'FREE — 免费格！',marked:true,free:true});
+  // pos 12 = caller cell (pre-marked so won't be unmarked)
+  bingoBoard.splice(12,0,{show:'📢',hint:'',marked:true,caller:true});
   const grid=document.getElementById('bingoGrid');
-  grid.innerHTML=bingoBoard.map((cell,i)=>`
-    <div class="bingo-cell${cell.free?' free':''}" id="bc${i}" onclick="markBingo(${i})" style="font-size:${cell.show.length>2?'0.7rem':'0.95rem'}">
-      ${cell.show}
-    </div>`).join('');
+  grid.innerHTML='';
+  bingoBoard.forEach((cell,i)=>{
+    const el=document.createElement('div');
+    if(cell.caller){
+      el.className='bingo-cell caller-center';
+      el.innerHTML='<div class="caller-label-in">📢 叫字</div><div class="caller-word-in" id="callerWord"></div><div class="caller-hint-in" id="callerHint"></div>';
+      el.onclick=callBingo;
+    } else {
+      el.className='bingo-cell';
+      el.id='bc'+i;
+      el.textContent=cell.show;
+      el.onclick=()=>markBingo(i);
+    }
+    grid.appendChild(el);
+  });
 }
 
 function callBingo(){
@@ -1473,6 +1600,7 @@ function callBingo(){
   document.getElementById('callerWord').textContent=item.show;
   document.getElementById('callerHint').textContent=item.hint;
   speak(item.show);
+  document.getElementById('bingoMsg').textContent='';
 }
 
 function markBingo(i){
@@ -1498,6 +1626,7 @@ function checkBingoWin(){
     bingoLines=newLines;
     document.getElementById('bScore').textContent=`连线: ${bingoLines}`;
     document.getElementById('bingoWin').style.display='block';
+   
     launchConfetti();
   }
 }
@@ -1530,7 +1659,7 @@ function showQuizQ(){
   document.getElementById('qBar').style.width=`${(qIdx/qItems.length)*100}%`;
   const wrong=VOCAB.filter(v=>v.word!==q.word).sort(()=>Math.random()-.5).slice(0,3);
   const opts=[q,...wrong].sort(()=>Math.random()-.5);
-  document.getElementById('qOpts').innerHTML=opts.map(o=>`<button class="quiz-opt" onclick="answerQuiz('${o.word.replace(/'/g,"\\'")}','${q.word.replace(/'/g,"\\'")}',this)">${o.meaning}</button>`).join('');
+  document.getElementById('qOpts').innerHTML=opts.map(o=>`<button class="quiz-opt" onclick="answerQuiz('${o.word.replace(/'/g,"\'")}','${q.word.replace(/'/g,"\'")}',this)">${o.meaning}</button>`).join('');
 }
 function answerQuiz(chosen,correct,btn){
   if(qAnswered) return;qAnswered=true;
@@ -1576,17 +1705,17 @@ let mainRecMR=null,mainChunks=[],mainBlob=null,mainRecSecs=0,mainRecInt=null,sel
 
 function buildRecSents(){
   document.getElementById('recSents').innerHTML=REC_SENTENCES.map((s,i)=>`
-    <button class="rsb" id="rsb${i}" onclick="selRec(${i})">
-      <div><div class="scn">${s.cn}</div><div class="sen">${s.en}</div></div>
-      <span style="font-size:1.2rem">▶</span>
-    </button>`).join('');
+    <div class="rsb" id="rsb${i}">
+      <div style="flex:1;cursor:pointer;" onclick="selRec(${i})"><div class="scn">${s.cn}</div><div class="sen">${s.en}</div></div>
+      <button class="rsb-play-btn" onclick="event.stopPropagation();selRec(${i});speak(${JSON.stringify(s.cn)})">🔊</button>
+    </div>`).join('');
 }
 function selRec(i){
   selRecIdx=i;
   document.querySelectorAll('.rsb').forEach((b,j)=>b.classList.toggle('selected',j===i));
   document.getElementById('rDisp').textContent=REC_SENTENCES[i].cn;
   document.getElementById('rPy').textContent=REC_SENTENCES[i].py;
-  document.getElementById('mRecStatus').textContent='准备好了！按"开始录音"。';
+  document.getElementById('mRecStatus').textContent='准备好了！按⏺开始录音。';
 }
 function playRefTTS(){if(selRecIdx>=0) speak(REC_SENTENCES[selRecIdx].cn);}
 
@@ -1594,14 +1723,16 @@ function toggleMainRec(){
   const btn=document.getElementById('mRecBtn');
   if(!mainRecMR||mainRecMR.state==='inactive'){
     navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
-      mainRecMR=new MediaRecorder(stream);mainChunks=[];
+      const mime=MediaRecorder.isTypeSupported('audio/mp4')?'audio/mp4':'audio/webm';
+      mainRecMR=new MediaRecorder(stream,{mimeType:mime});mainChunks=[];
       mainRecMR.ondataavailable=e=>mainChunks.push(e.data);
       mainRecMR.onstop=()=>{
-        mainBlob=new Blob(mainChunks,{type:'audio/webm'});
+        mainBlob=new Blob(mainChunks,{type:mainRecMR.mimeType});
         document.getElementById('mPlayBtn').disabled=false;
         document.getElementById('mDlBtn').disabled=false;
         document.getElementById('mRecStatus').textContent='录音完成！点▶听听看。';
         clearInterval(mainRecInt);
+        mainRecMR.stream.getTracks().forEach(t=>t.stop());
       };
       mainRecMR.start();btn.textContent='⏹ 停止';
       mainRecSecs=0;
@@ -1616,7 +1747,7 @@ function playMainRec(){if(mainBlob){const a=new Audio(URL.createObjectURL(mainBl
 function downloadRec(){
   if(!mainBlob) return;
   const a=document.createElement('a');a.href=URL.createObjectURL(mainBlob);
-  a.download=`lesson${LESSON_NUM}_recording.webm`;a.click();
+  a.download=`lesson4_recording.${mainBlob.type.includes('mp4')?'mp4':'webm'}`;a.click();
 }
 
 // ═══════════════════════════════════════════════
@@ -1632,6 +1763,25 @@ function launchConfetti(){
 }
 
 // ═══════════════════════════════════════════════
+
+// ── MCQ HELPERS ─────────────────────────────────────────────
+function pickFill(qi,chosen,correct,btn){
+  const c=btn.closest('.mcq-opts');c.querySelectorAll('.mcq-opt').forEach(b=>{b.disabled=true;});
+  const fb=document.getElementById('fillFb'+qi);
+  if(chosen===correct){btn.classList.add('correct');fb.innerHTML='<span style="color:#43a047;font-weight:700">✓ 正确！</span>';launchConfetti();}
+  else{btn.classList.add('wrong');c.querySelectorAll('.mcq-opt').forEach(b=>{if(b.textContent.trim()===correct)b.classList.add('correct');});fb.innerHTML='<span style="color:#e53935">✗ 答案是：<strong>'+correct+'</strong></span>';}
+}
+function pickTransform(qi,chosen,correct,btn){
+  const c=btn.closest('.mcq-opts');c.querySelectorAll('.mcq-opt').forEach(b=>{b.disabled=true;});
+  const fb=document.getElementById('tfmFb'+qi);
+  if(chosen===correct){btn.classList.add('correct');fb.innerHTML='<span style="color:#43a047;font-weight:700">✓ 正确！</span>';launchConfetti();}
+  else{btn.classList.add('wrong');c.querySelectorAll('.mcq-opt').forEach(b=>{if(b.textContent.trim()===correct)b.classList.add('correct');});fb.innerHTML='<span style="color:#e53935">✗ 参考答案：<strong>'+correct+'</strong></span>';}
+}
+function resetMCQ(){
+  document.querySelectorAll('.mcq-opt').forEach(b=>{b.disabled=false;b.classList.remove('correct','wrong');});
+  document.querySelectorAll('.fill-fb,.tfm-fb').forEach(e=>e.innerHTML='');
+}
+
 // INIT
 // ═══════════════════════════════════════════════
 buildStory();

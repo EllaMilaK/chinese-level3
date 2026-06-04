@@ -4,7 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>中文学习乐园 · 第三册</title>
-<meta name="theme-color" content="#1b5e20">
+
+<!-- ── PWA / Add-to-Home-Screen ── -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1e6b22">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="中文三册">
+<link rel="apple-touch-icon" href="icon-192.png">
+<script>
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', ()=>
+      navigator.serviceWorker.register('./sw.js')
+        .catch(e=>console.warn('SW:', e))
+    );
+  }
+</script>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{
@@ -478,7 +495,7 @@ footer{
       <span class="card-emoji">🌳</span>
       <div class="card-cn">大树和小鸟</div>
       <div class="card-py">dà shù hé xiǎo niǎo</div>
-      <div class="card-en">Big Tree & Little Bird</div>
+      <div class="card-en">Big Tree &amp; Little Bird</div>
       <span class="card-tag">即将开放</span>
     </a>
 
